@@ -134,6 +134,68 @@ input[type=range]{width:100%; accent-color:var(--accent); margin:0; display:bloc
 .foot b{color:var(--ink)}
 .foot p{margin:0 0 9px} .foot p:last-child{margin:0}
 
+
+/* ---------- reference document ---------- */
+.doc{margin-top:34px; border-top:2px solid var(--ink)}
+.doc section{padding:34px 0; border-top:1px solid var(--rule)}
+.doc section:first-child{border-top:none}
+.doc .eyebrow{font-family:"IBM Plex Mono",monospace; font-size:10.5px; letter-spacing:.13em; text-transform:uppercase;
+  color:var(--accent); margin:0 0 11px; font-weight:500}
+.doc h2{font-size:clamp(20px,2.6vw,27px); font-weight:700; letter-spacing:-.022em; margin:0 0 14px;
+  text-wrap:balance; max-width:26ch; line-height:1.16}
+.doc h3{font-size:15px; font-weight:600; margin:24px 0 7px; letter-spacing:-.005em}
+.doc h3:first-child{margin-top:0}
+.doc p{margin:0 0 12px; font-size:14px; line-height:1.62; color:var(--ink-2)}
+.doc p:last-child{margin-bottom:0}
+.doc b{color:var(--ink); font-weight:600}
+.doc .prose{max-width:70ch}
+.doc .small{font-size:12.5px; color:var(--muted)}
+.two{display:grid; grid-template-columns:repeat(auto-fit,minmax(290px,1fr)); gap:14px 40px}
+.tiles{display:grid; grid-template-columns:repeat(auto-fit,minmax(168px,1fr)); gap:1px;
+  background:var(--rule); border:1px solid var(--rule); margin:20px 0 6px}
+.tile{background:var(--panel); padding:15px 15px 16px}
+.tile.hi{background:var(--good-soft)}
+.tile .k{font-family:"IBM Plex Mono",monospace; font-size:9.5px; letter-spacing:.09em; text-transform:uppercase;
+  color:var(--muted); margin-bottom:7px; line-height:1.5}
+.tile .v{font-family:Archivo,sans-serif; font-size:31px; font-weight:700; letter-spacing:-.03em; line-height:1}
+.tile.hi .v{color:var(--good)}
+.tile .v span{font-size:14px; font-weight:600; color:var(--muted); letter-spacing:0}
+.tile .n{font-size:11.5px; color:var(--muted); margin-top:7px; line-height:1.45}
+.doc .scroll{overflow-x:auto; margin:16px 0 6px}
+.doc table{width:100%; border-collapse:collapse; font-size:13.5px; min-width:520px}
+.doc th{font-family:"IBM Plex Mono",monospace; font-size:9.5px; letter-spacing:.09em; text-transform:uppercase;
+  color:var(--muted); font-weight:500; text-align:left; padding:0 12px 9px 0; border-bottom:1px solid var(--ink)}
+.doc td{padding:10px 12px 10px 0; border-bottom:1px solid var(--rule); color:var(--ink-2)}
+.doc th.n,.doc td.n{text-align:right; padding-right:0; font-family:"IBM Plex Mono",monospace;
+  font-variant-numeric:tabular-nums; white-space:nowrap}
+.doc td.g{color:var(--good); font-weight:600}
+.doc tr.hl td{background:var(--good-soft)}
+.doc tr.hl td:first-child{font-weight:600; color:var(--ink)}
+.specs{display:grid; grid-template-columns:repeat(auto-fit,minmax(232px,1fr)); gap:1px;
+  background:var(--rule); border:1px solid var(--rule); margin-top:16px}
+.specs dl{background:var(--panel); margin:0; padding:15px 16px; display:grid;
+  grid-template-columns:1fr auto; gap:8px 12px; font-size:13px}
+.specs dt{color:var(--ink-2)}
+.specs dd{margin:0; font-family:"IBM Plex Mono",monospace; font-size:12px; text-align:right;
+  font-variant-numeric:tabular-nums; white-space:nowrap; color:var(--ink)}
+.risks{margin-top:24px; background:var(--panel); border:1px solid var(--rule); border-left:3px solid var(--bad); padding:16px 18px 17px}
+.risks h3{margin-top:0}
+.risks ol{margin:0; padding-left:19px}
+.risks li{font-size:13.5px; line-height:1.6; color:var(--ink-2); margin-bottom:9px}
+.risks li:last-child{margin-bottom:0}
+.phases{display:grid; grid-template-columns:repeat(auto-fit,minmax(258px,1fr)); gap:1px;
+  background:var(--rule); border:1px solid var(--rule); margin:18px 0 6px}
+.ph{background:var(--panel); padding:16px 17px 18px}
+.ph .pn{font-family:"IBM Plex Mono",monospace; font-size:10px; letter-spacing:.12em; text-transform:uppercase;
+  color:var(--accent); font-weight:600; margin-bottom:8px}
+.ph h3{margin:0 0 8px; font-size:14.5px; line-height:1.3}
+.ph p{font-size:13px; margin-bottom:9px}
+.ph .m{color:var(--muted); font-size:12px; border-top:1px solid var(--rule); padding-top:9px; margin-bottom:0}
+.oq{margin:10px 0 0; padding-left:19px}
+.oq li{font-size:13.5px; line-height:1.6; color:var(--ink-2); margin-bottom:8px}
+.method{background:var(--panel-2); margin-top:0; padding-left:18px !important; padding-right:18px !important}
+@media(max-width:640px){ .doc h2{max-width:none} }
+
 @media(max-width:900px){
   .app{grid-template-columns:1fr}
   .rail{position:static; order:2}
@@ -263,10 +325,148 @@ input[type=range]{width:100%; accent-color:var(--accent); margin:0; display:bloc
   </div>
 </div>
 
-<div class="foot">
-  <p><b>How to read this.</b> The shaded band between the two curves <em>is</em> the product. It widens as the run proceeds, because the bare machine keeps soaking heat into a desk that cannot absorb it fast enough. Where a curve flattens at 100&nbsp;°C on the chip view, that machine has started throttling — it is holding temperature by doing less work, which the “work sustained” figure shows.</p>
-  <p><b>What is being solved.</b> Two transient cases step together. Solids are lumped RC nodes — chip, chassis, and twenty slices of the stand along the flow path. Air is marched slice by slice. Channel flow comes from a pressure balance: buoyancy against viscous loss when passive, fan curve against system curve when active. The desk is a semi-infinite solid under transient flux, which is why a steel desk behaves nothing like oak. One constant is fitted so a bare machine on wood reaches 46&nbsp;°C case and 95&nbsp;°C chip after 45 minutes at 16&nbsp;W and 22&nbsp;°C. Not CFD — it resolves temperature along the channel, not across the machine, so no hot spots and no recirculation. Compare configurations with it; do not quote absolute numbers from it.</p>
+<div class="doc">
+
+<section>
+  <p class="eyebrow">§1 — By the numbers</p>
+  <h2>What the model says this is worth</h2>
+  <p class="prose">Everything below comes from one consistent run: 30&nbsp;°C room, 45 minutes of sustained load, default geometry. Change any input in the simulator above and these move with it.</p>
+
+  <div class="tiles">
+    <div class="tile"><div class="k">Passive · case cooler by</div><div class="v">8.7<span> °C</span></div>
+      <div class="n">stand alone, wooden desk, 16 W</div></div>
+    <div class="tile hi"><div class="k">Active · case cooler by</div><div class="v">16.7<span> °C</span></div>
+      <div class="n">fan module docked, same conditions</div></div>
+    <div class="tile hi"><div class="k">Sustained work gained</div><div class="v">+38<span> %</span></div>
+      <div class="n">24 W demanded, both pinned at the chip limit</div></div>
+    <div class="tile"><div class="k">Heat-exchange area</div><div class="v">4,627<span> cm²</span></div>
+      <div class="n">80 channels inside a 30 mm-tall part</div></div>
+    <div class="tile"><div class="k">Front lift</div><div class="v">0<span> mm</span></div>
+      <div class="n">typing angle changes by 7.9° at the hinge only</div></div>
+    <div class="tile"><div class="k">Aluminium mass</div><div class="v">393<span> g</span></div>
+      <div class="n">skins plus corrugated core, 6061</div></div>
+  </div>
+
+  <h3>The desk underneath changes the answer</h3>
+  <p class="prose">This is the least intuitive result in the whole study. Passively, the stand is mostly a <em>conduction bridge</em> — so how well it works depends on what it can conduct into.</p>
+  <div class="scroll">
+  <table>
+    <thead><tr><th>Desk surface</th><th class="n">Flat on desk</th><th class="n">On the stand</th><th class="n">Saved</th><th class="n">With fans</th><th class="n">Saved</th></tr></thead>
+    <tbody>
+      <tr><td>Wood</td><td class="n">53.2 °C</td><td class="n">44.5 °C</td><td class="n g">8.7 K</td><td class="n">36.6 °C</td><td class="n g">16.7 K</td></tr>
+      <tr><td>Laminate</td><td class="n">52.1 °C</td><td class="n">43.8 °C</td><td class="n g">8.4 K</td><td class="n">36.4 °C</td><td class="n g">15.7 K</td></tr>
+      <tr><td>Glass</td><td class="n">48.9 °C</td><td class="n">40.8 °C</td><td class="n g">8.1 K</td><td class="n">35.7 °C</td><td class="n g">13.2 K</td></tr>
+      <tr class="hl"><td>Steel</td><td class="n">48.5 °C</td><td class="n">34.3 °C</td><td class="n g">14.2 K</td><td class="n">33.3 °C</td><td class="n g">15.3 K</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="prose small">On steel the passive stand nearly matches the active one — the desk itself becomes the heat sink. On wood it has nowhere to dump, and the fan module has to do the work.</p>
+
+  <h3>Build specification, as modelled</h3>
+  <div class="specs">
+    <dl><dt>Rear height</dt><dd>30 mm</dd><dt>Front intake face</dt><dd>13.5 mm</dd>
+        <dt>Stand depth</dt><dd>118 mm</dd><dt>Body coverage</dt><dd>55 %</dd>
+        <dt>Laptop tilt</dt><dd>7.9°</dd></dl>
+    <dl><dt>Corrugation pitch</dt><dd>14 mm</dd><dt>Channel count</dt><dd>80</dd>
+        <dt>Hydraulic diameter</dt><dd>5.7 mm</dd><dt>Open flow area</dt><dd>55.3 cm²</dd>
+        <dt>Skin / fin gauge</dt><dd>1.0 / 0.4 mm</dd></dl>
+    <dl><dt>Module envelope</dt><dd>200 × 36 × 30</dd><dt>Fan spec modelled</dt><dd>45 Pa · 3 CFM</dd>
+        <dt>Air speed, passive</dt><dd>2.3 mm/s</dd><dt>Air speed, active</dt><dd>254 mm/s</dd>
+        <dt>Attachment</dt><dd>magnetic, 2 pucks</dd></dl>
+  </div>
+</section>
+
+<section>
+  <p class="eyebrow">§2 — Product value</p>
+  <h2>The fan module is not an accessory. It is the product.</h2>
+
+  <div class="two">
+    <div>
+      <h3>The problem being solved</h3>
+      <p>The MacBook Air M3 has no fan. Under sustained load it does not fail — it quietly slows down, holding its chip at about 100&nbsp;°C by doing less work. In a 30&nbsp;°C room it gives up roughly 40% of its demanded power.</p>
+      <p>So this is not a comfort accessory. <b>It is a performance accessory.</b> The temperature drop is the mechanism; the sustained watts are the benefit. That distinction should drive how the product is positioned, priced, and demonstrated.</p>
+
+      <h3>Who it is for</h3>
+      <p>People doing long, heavy, repeated work on a fanless machine: compiling, rendering, exporting video, running local models, long calls in a warm room. Anyone whose machine is fast for thirty seconds and ordinary after ten minutes.</p>
+    </div>
+    <div>
+      <h3>The honest finding</h3>
+      <p>Passively, the corrugation is not working as a duct. Solved channel velocity is about <b>2 mm/s</b>, carrying well under a watt. Almost all of the passive 8.7&nbsp;K comes from metal touching the laptop and conducting heat away — not from moving air.</p>
+      <p>A plain finned plate would get most of that. The corrugated core only earns its complexity once air is being forced through it, where those 4,627&nbsp;cm² become genuinely excellent.</p>
+      <p><b>Conclusion:</b> lead with the active product. Passive is the silent fallback, not the headline.</p>
+
+      <h3>What is actually differentiated</h3>
+      <p><b>Rear-only, zero front lift.</b> Most stands tilt the whole machine. This one leaves the front edge down and the wrists where they were.</p>
+      <p><b>Contact, not clearance.</b> Competitors lift the laptop into air. This conducts into metal — a fundamentally wider path.</p>
+      <p><b>One core, two modes.</b> The same part is a passive spreader and a forced-convection heat exchanger.</p>
+    </div>
+  </div>
+
+  <div class="risks">
+    <h3>What could still sink it</h3>
+    <ol>
+      <li><b>Contact quality is everything.</b> If the laptop does not sit flat and tight on the top skin, most of the passive benefit disappears. Flatness tolerance and a compliant thermal pad are the highest-risk details in the design — higher than channel shape by a wide margin.</li>
+      <li><b>Weight.</b> 393 g of aluminium against a 1.24 kg laptop. “Slim and portable” gets strained; be honest in the positioning rather than discovering it in reviews.</li>
+      <li><b>Never modelled:</b> fan noise, battery runtime, and whether magnets strong enough to dock reliably are also strong enough to worry people near a laptop. Any of these could kill the product independently of thermals.</li>
+      <li><b>Desk dependence.</b> Weakest on soft, insulating surfaces — sofas, beds, wooden desks — which is where laptops often actually sit.</li>
+    </ol>
+  </div>
+</section>
+
+<section>
+  <p class="eyebrow">§3 — Vision</p>
+  <h2>Where this goes next</h2>
+  <p class="prose">Ordered so the cheapest test of the riskiest assumption comes first. Do not tool a corrugated core until the two mechanisms that carry the heat have been measured.</p>
+
+  <div class="phases">
+    <div class="ph">
+      <div class="pn">Phase 1</div>
+      <h3>Prove the mechanisms, not the shape</h3>
+      <p>Build the rear fan module and bolt it to a <em>plain flat aluminium plate</em>. No corrugation, no tooling. This isolates the only two things the model says matter: contact conduction and forced airflow.</p>
+      <p class="m">Cost: a few hundred. Time: a weekend. Answers: most of the risk.</p>
+    </div>
+    <div class="ph">
+      <div class="pn">Phase 2</div>
+      <h3>Measure, then commit to the core</h3>
+      <p>Repeatable sustained load, thermocouples on the bottom case at three points, chip temperature and package power logged together. Test on wood and on steel. Only if active mode validates does the corrugated core justify its tooling.</p>
+      <p class="m">A cooler machine holds a higher clock, so watch power as well as temperature — an experiment that gets faster instead of cooler is still a win.</p>
+    </div>
+    <div class="ph">
+      <div class="pn">Phase 3</div>
+      <h3>Make it a product</h3>
+      <p>Battery runtime and charging, fan curve and acoustic target, magnet strength and safety, industrial design, and the contact pad that makes or breaks the passive mode. Then variants — other machines, other footprints.</p>
+      <p class="m">The hard engineering here is mechanical and acoustic, not thermal. The thermal question will already be settled.</p>
+    </div>
+  </div>
+
+  <h3>Open questions the model cannot answer</h3>
+  <ul class="oq">
+    <li>What contact conductance is actually achievable with an unclamped laptop resting under its own weight?</li>
+    <li>Is pull or push better in practice once real ducting losses and leakage are present?</li>
+    <li>How loud is 3 CFM through 80 narrow channels — and is that acceptable beside a silent machine?</li>
+    <li>Does the rear riser foul the display at wide opening angles on a real chassis?</li>
+    <li>Will anyone carry 393 g to get 17 °C, or does the market want the passive-only version at half the weight?</li>
+  </ul>
+</section>
+
+<section class="method">
+  <p class="eyebrow">§4 — Method &amp; limits</p>
+  <h2>How to read any of this</h2>
+  <div class="two">
+    <div>
+      <p><b>Reading the chart.</b> The shaded band between the two curves is the product. It widens as the run proceeds, because the bare machine keeps soaking heat into a desk that cannot absorb it fast enough. Where a curve flattens at 100&nbsp;°C on the chip view, that machine has started throttling — holding temperature by doing less work, which the “work sustained” figure reports.</p>
+      <p><b>What is solved.</b> Two transient cases step together. Solids are lumped RC nodes — chip, chassis, and twenty slices of the stand along the flow path. Air is marched slice by slice with an effectiveness-NTU step. Channel flow comes from a pressure balance: buoyancy against viscous loss when passive, fan curve against system curve when active. Radiation uses parallel-plate view factors. The desk is a semi-infinite solid under transient flux, which is why temperatures keep creeping for an hour and why steel behaves nothing like oak.</p>
+    </div>
+    <div>
+      <p><b>The one fitted constant.</b> Physics correlations alone drift, so the model is anchored to a known observable: a bare machine on a wooden desk reaching 46&nbsp;°C case and 95&nbsp;°C chip after 45 minutes at 16&nbsp;W and 22&nbsp;°C ambient. One constant was adjusted until it reproduced that; everything else was left alone.</p>
+      <p><b>What it cannot do.</b> Not CFD. It resolves temperature <em>along</em> the channel, not across the machine — no hot spots, no recirculation, no flow separation. Individual conductances are good to roughly ±30–40%. The comparisons are the trustworthy part, because they come from the same equations applied consistently. The absolute numbers inherit the anchor and the assumptions.</p>
+      <p><b>Status.</b> Nothing here has been built or measured. Treat every figure as a hypothesis with a number attached, good enough to choose between designs and not good enough for a spec sheet.</p>
+    </div>
+  </div>
+</section>
+
 </div>
+
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
