@@ -1,0 +1,1024 @@
+<title>Wedge Thermal Simulator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  --ground:#EDEFF1; --panel:#FAFBFB; --panel-2:#E3E7E9; --stage:#E6EAEC;
+  --ink:#13181B; --ink-2:#39434A; --muted:#69737A;
+  --rule:#D5DADD; --rule-2:#C0C7CB;
+  --accent:#0F6B88; --accent-ink:#FFFFFF;
+  --cool:#1E88B8; --hot:#C9651C; --metal:#8E999F; --grid:#C8CFD3;
+  --good:#1E7A4C; --good-soft:#D8EBE0; --bad:#C0392B;
+  --lineDesk:#C9651C; --lineStand:#0F6B88; --band:rgba(15,107,136,.13);
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --ground:#0D1012; --panel:#15191C; --panel-2:#1D2226; --stage:#101417;
+  --ink:#E8EDEF; --ink-2:#C0C8CC; --muted:#8D979D;
+  --rule:#252B2F; --rule-2:#343C41;
+  --accent:#4FB3D4; --accent-ink:#06171E;
+  --cool:#4FB3D4; --hot:#E8934F; --metal:#78838A; --grid:#242B30;
+  --good:#4BC98A; --good-soft:#12301F; --bad:#E8705F;
+  --lineDesk:#E8934F; --lineStand:#4FB3D4; --band:rgba(79,179,212,.16);
+}}
+:root[data-theme="dark"]{
+  --ground:#0D1012; --panel:#15191C; --panel-2:#1D2226; --stage:#101417;
+  --ink:#E8EDEF; --ink-2:#C0C8CC; --muted:#8D979D;
+  --rule:#252B2F; --rule-2:#343C41;
+  --accent:#4FB3D4; --accent-ink:#06171E;
+  --cool:#4FB3D4; --hot:#E8934F; --metal:#78838A; --grid:#242B30;
+  --good:#4BC98A; --good-soft:#12301F; --bad:#E8705F;
+  --lineDesk:#E8934F; --lineStand:#4FB3D4; --band:rgba(79,179,212,.16);
+}
+*{box-sizing:border-box}
+body{background:var(--ground); color:var(--ink); font-family:Archivo,"Helvetica Neue",Arial,sans-serif;
+  font-size:15px; line-height:1.5; -webkit-font-smoothing:antialiased}
+.wrap{max-width:1380px; margin:0 auto; padding:18px 20px 48px}
+.mono{font-family:"IBM Plex Mono",ui-monospace,Menlo,monospace; font-variant-numeric:tabular-nums}
+
+.head{display:flex; flex-wrap:wrap; align-items:flex-end; justify-content:space-between; gap:10px 26px;
+  padding-bottom:12px; border-bottom:1.5px solid var(--ink); margin-bottom:16px}
+.head h1{font-size:clamp(19px,2.3vw,24px); font-weight:700; letter-spacing:-.02em; margin:0 0 3px}
+.head p{margin:0; color:var(--muted); font-size:13.5px; max-width:72ch}
+.stamp{font-family:"IBM Plex Mono",monospace; font-size:10px; letter-spacing:.12em; text-transform:uppercase;
+  color:var(--muted); text-align:right; line-height:1.7}
+
+/* ---------- two-column app layout ---------- */
+.app{display:grid; grid-template-columns:322px minmax(0,1fr); gap:18px; align-items:start}
+.rail{position:sticky; top:14px; display:flex; flex-direction:column; gap:1px;
+  background:var(--rule); border:1px solid var(--rule); border-radius:4px; overflow:hidden}
+.rail section{background:var(--panel); padding:14px 15px 15px}
+.rail h2{font-family:"IBM Plex Mono",monospace; font-size:10px; letter-spacing:.12em; text-transform:uppercase;
+  color:var(--muted); font-weight:500; margin:0 0 12px}
+.main{display:flex; flex-direction:column; gap:14px; min-width:0}
+
+button{font-family:Archivo,sans-serif; font-size:13px; font-weight:500; cursor:pointer; color:var(--ink);
+  background:var(--panel); border:none; padding:7px 12px}
+button:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+.seg{display:flex; border:1px solid var(--rule-2); border-radius:3px; overflow:hidden; background:var(--panel); width:100%}
+.seg button{flex:1; padding:7px 6px}
+.seg button + button{border-left:1px solid var(--rule-2)}
+.seg button[aria-pressed="true"]{background:var(--accent); color:var(--accent-ink); font-weight:600}
+.runrow{display:flex; gap:7px; margin-bottom:11px}
+.run{flex:2; background:var(--accent); color:var(--accent-ink); border-radius:3px; padding:9px; font-weight:600; font-size:14px}
+.run.paused{background:var(--accent)}
+.rst{flex:1; border:1px solid var(--rule-2); border-radius:3px}
+.glab{display:block; font-family:"IBM Plex Mono",monospace; font-size:9.5px; letter-spacing:.11em;
+  text-transform:uppercase; color:var(--muted); margin:11px 0 5px}
+.glab:first-child{margin-top:0}
+.sl{margin-bottom:12px}
+.sl:last-child{margin-bottom:0}
+.sl label{display:flex; justify-content:space-between; align-items:baseline; font-size:12.5px; color:var(--ink-2); margin-bottom:4px}
+.sl label b{font-family:"IBM Plex Mono",monospace; font-size:12px; color:var(--ink); font-weight:600}
+input[type=range]{width:100%; accent-color:var(--accent); margin:0; display:block}
+.pick{display:flex; gap:4px; flex-wrap:wrap}
+.pick button{flex:1; border:1px solid var(--rule-2); border-radius:3px; padding:6px 2px; font-size:11.5px; min-width:52px}
+.pick button[aria-pressed="true"]{background:var(--accent); color:var(--accent-ink); border-color:var(--accent); font-weight:600}
+
+/* ---------- stage ---------- */
+.stage{position:relative; background:var(--stage); border:1px solid var(--rule); border-radius:4px;
+  overflow:hidden; height:clamp(272px,38vh,400px)}
+.stage canvas{display:block; width:100%; height:100%; touch-action:none; cursor:grab}
+.stage canvas:active{cursor:grabbing}
+#labels{position:absolute; inset:0; pointer-events:none}
+.lab{position:absolute; transform:translate(-50%,-50%); font-family:"IBM Plex Mono",monospace; font-size:10.5px;
+  white-space:nowrap; padding:2px 6px; border-radius:2px; background:var(--panel); color:var(--ink);
+  border:1px solid var(--rule-2); transition:opacity .18s}
+.hud{position:absolute; left:11px; top:10px; font-family:"IBM Plex Mono",monospace; font-size:10.5px;
+  color:var(--muted); pointer-events:none; line-height:1.8}
+.hud b{color:var(--ink); font-weight:600; font-size:16px}
+.hint{position:absolute; left:11px; bottom:9px; font-family:"IBM Plex Mono",monospace; font-size:9.5px;
+  color:var(--muted); pointer-events:none}
+.scale{position:absolute; right:11px; top:10px; width:150px; pointer-events:none;
+  font-family:"IBM Plex Mono",monospace; font-size:9.5px; color:var(--muted)}
+.scale .bar2{height:8px; border-radius:2px; border:1px solid var(--rule-2); margin-bottom:2px;
+  background:linear-gradient(90deg,#1B3278,#1E8CBE,#50BE8C,#EBCD5A,#F08C37,#D7372D)}
+.scale .ends{display:flex; justify-content:space-between}
+
+/* ---------- delta hero ---------- */
+.hero{display:grid; grid-template-columns:minmax(210px,1fr) 2fr; gap:1px; background:var(--rule);
+  border:1px solid var(--rule); border-radius:4px; overflow:hidden}
+.hero .savebox{background:var(--good-soft); padding:15px 17px 16px; display:flex; flex-direction:column; justify-content:center}
+.hero .cap{font-family:"IBM Plex Mono",monospace; font-size:9.5px; letter-spacing:.11em; text-transform:uppercase;
+  color:var(--muted); margin-bottom:5px}
+.hero .save{font-family:Archivo,sans-serif; font-size:clamp(38px,5.2vw,52px); font-weight:700; letter-spacing:-.035em;
+  line-height:.95; color:var(--good)}
+.hero .save span{font-size:20px; font-weight:600}
+.hero .flow{font-family:"IBM Plex Mono",monospace; font-size:12px; color:var(--ink-2); margin-top:8px}
+.hero .flow i{font-style:normal; color:var(--muted)}
+.hero .stats{background:var(--panel); padding:13px 15px; display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(112px,1fr)); gap:12px 14px; align-content:center}
+.st .k{font-family:"IBM Plex Mono",monospace; font-size:9.5px; letter-spacing:.09em; text-transform:uppercase;
+  color:var(--muted); margin-bottom:3px}
+.st .v{font-family:Archivo,sans-serif; font-size:19px; font-weight:600; letter-spacing:-.02em; line-height:1.15}
+.st .v small{font-size:12px; color:var(--muted); font-weight:500}
+.thr{display:inline-block; margin-top:4px; padding:1px 5px; border-radius:2px; font-family:"IBM Plex Mono",monospace;
+  font-size:9px; letter-spacing:.05em; background:var(--panel-2); color:var(--muted)}
+.thr.on{background:var(--bad); color:#fff}
+
+/* ---------- chart ---------- */
+.chartbox{background:var(--panel); border:1px solid var(--rule); border-radius:4px; padding:12px 14px 10px}
+.chead{display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:8px 14px; margin-bottom:8px}
+.chead h2{font-family:"IBM Plex Mono",monospace; font-size:10px; letter-spacing:.12em; text-transform:uppercase;
+  color:var(--muted); font-weight:500; margin:0}
+.keys{display:flex; gap:14px; font-size:11.5px; color:var(--ink-2); font-family:"IBM Plex Mono",monospace}
+.keys i{display:inline-block; width:16px; height:2.5px; vertical-align:middle; margin-right:5px}
+.plotsel{display:flex; border:1px solid var(--rule-2); border-radius:3px; overflow:hidden}
+.plotsel button{padding:4px 10px; font-size:11.5px; font-family:"IBM Plex Mono",monospace}
+.plotsel button + button{border-left:1px solid var(--rule-2)}
+.plotsel button[aria-pressed="true"]{background:var(--accent); color:var(--accent-ink); font-weight:600}
+#chartCv{display:block; width:100%; height:212px}
+
+.foot{margin-top:16px; border-left:3px solid var(--accent); background:var(--panel); padding:13px 16px;
+  font-size:12.5px; line-height:1.6; color:var(--ink-2)}
+.foot b{color:var(--ink)}
+.foot p{margin:0 0 9px} .foot p:last-child{margin:0}
+
+@media(max-width:900px){
+  .app{grid-template-columns:1fr}
+  .rail{position:static; order:2}
+  .main{order:1}
+  .hero{grid-template-columns:1fr}
+}
+</style>
+
+<div class="wrap">
+<div class="head">
+  <div>
+    <h1>Wedge Thermal Simulator</h1>
+    <p>Transient thermal model of a MacBook Air 13.6″ M3 on the corrugated cooling wedge. Every case runs twice — on the stand and flat on the desk — so the gap between them is the product.</p>
+  </div>
+  <div class="stamp">RC network + 1-D channel march<br>Calibrated, not measured<br>&plusmn;30&ndash;40% on conductances</div>
+</div>
+
+<div class="app">
+
+  <!-- ============ CONTROL RAIL ============ -->
+  <div class="rail">
+    <section>
+      <h2>Simulation</h2>
+      <div class="runrow">
+        <button class="run" id="bRun">Run</button>
+        <button class="rst" id="bReset">Reset</button>
+      </div>
+      <span class="glab">Speed</span>
+      <div class="seg" role="group" aria-label="Simulation speed">
+        <button data-spd="1">1&times;</button><button data-spd="60">60&times;</button>
+        <button data-spd="300" aria-pressed="true">300&times;</button><button data-spd="900">900&times;</button>
+      </div>
+      <span class="glab">Cooling mode</span>
+      <div class="seg" role="group" aria-label="Cooling mode">
+        <button id="mPassive" aria-pressed="true">Passive</button><button id="mActive">Active — fans</button>
+      </div>
+    </section>
+
+    <section>
+      <h2>Operating conditions</h2>
+      <div class="sl"><label for="sAmb">Room temperature <b id="vAmb">30 °C</b></label>
+        <input type="range" id="sAmb" min="18" max="40" step="1" value="30"></div>
+      <div class="sl"><label for="sLoad">Workload demand <b id="vLoad">16 W</b></label>
+        <input type="range" id="sLoad" min="5" max="26" step="1" value="16"></div>
+      <span class="glab">Desk surface</span>
+      <div class="pick" id="pDesk">
+        <button data-desk="wood" aria-pressed="true">Wood</button><button data-desk="laminate">Laminate</button>
+        <button data-desk="glass">Glass</button><button data-desk="steel">Steel</button></div>
+    </section>
+
+    <section>
+      <h2>Stand geometry</h2>
+      <div class="sl"><label for="sRear">Rear height <b id="vRear">30 mm</b></label>
+        <input type="range" id="sRear" min="16" max="42" step="1" value="30"></div>
+      <div class="sl"><label for="sCov">Body coverage <b id="vCov">55 %</b></label>
+        <input type="range" id="sCov" min="35" max="75" step="1" value="55"></div>
+      <div class="sl"><label for="sPitch">Corrugation pitch <b id="vPitch">14 mm</b></label>
+        <input type="range" id="sPitch" min="6" max="24" step="1" value="14"></div>
+    </section>
+
+    <section>
+      <h2>Fan module</h2>
+      <div class="sl"><label for="sFanPa">Static pressure <b id="vFanPa">45 Pa</b></label>
+        <input type="range" id="sFanPa" min="15" max="90" step="5" value="45"></div>
+      <div class="sl"><label for="sFanQ">Free-air flow <b id="vFanQ">3.0 CFM</b></label>
+        <input type="range" id="sFanQ" min="1" max="8" step="0.5" value="3"></div>
+    </section>
+
+    <section>
+      <h2>Display</h2>
+      <div class="seg" role="group" aria-label="Display toggles">
+        <button class="tgl" id="bThermal" aria-pressed="true">Thermal</button>
+        <button class="tgl" id="bSection">Section</button>
+        <button class="tgl" id="bLabels" aria-pressed="true">Labels</button>
+      </div>
+      <span class="glab">Camera</span>
+      <div class="seg" role="group" aria-label="Camera presets">
+        <button data-view="iso">ISO</button><button data-view="front">FRONT</button>
+        <button data-view="side">SIDE</button><button data-view="rear">REAR</button>
+      </div>
+    </section>
+  </div>
+
+  <!-- ============ OUTPUT ============ -->
+  <div class="main">
+    <div class="stage" id="stage">
+      <canvas id="cv"></canvas>
+      <div id="labels"></div>
+      <div class="hud" id="hud"></div>
+      <div class="scale"><div class="bar2"></div>
+        <div class="ends"><span id="scLo">30 °C</span><span id="scHi">60 °C</span></div></div>
+      <div class="hint">drag to orbit · scroll to zoom · shift-drag to pan</div>
+    </div>
+
+    <div class="hero">
+      <div class="savebox">
+        <div class="cap">Outer case, cooler by</div>
+        <div class="save" id="dBig">—</div>
+        <div class="flow" id="dFlow">—</div>
+      </div>
+      <div class="stats">
+        <div class="st"><div class="k">Flat on desk</div><div class="v" id="rdSkin">—</div>
+          <div class="thr" id="chipDesk">—</div></div>
+        <div class="st"><div class="k">On the stand</div><div class="v" id="rsSkin">—</div>
+          <div class="thr" id="chipStand">—</div></div>
+        <div class="st"><div class="k">Chip runs cooler</div><div class="v" id="dJuncS">—</div></div>
+        <div class="st"><div class="k">Work sustained</div><div class="v" id="dPowS">—</div></div>
+        <div class="st"><div class="k">Channel air</div><div class="v" id="dVel">—</div></div>
+        <div class="st"><div class="k">Fin area</div><div class="v" id="dFin">—</div></div>
+      </div>
+    </div>
+
+    <div class="chartbox">
+      <div class="chead">
+        <h2>Temperature over time</h2>
+        <div class="keys">
+          <span><i style="background:var(--lineDesk)"></i>Flat on desk</span>
+          <span><i style="background:var(--lineStand)"></i>On the stand</span>
+        </div>
+        <div class="plotsel" role="group" aria-label="Which temperature to plot">
+          <button data-plot="skin" aria-pressed="true">Outer case</button>
+          <button data-plot="junc">Chip</button>
+        </div>
+      </div>
+      <canvas id="chartCv"></canvas>
+    </div>
+  </div>
+</div>
+
+<div class="foot">
+  <p><b>How to read this.</b> The shaded band between the two curves <em>is</em> the product. It widens as the run proceeds, because the bare machine keeps soaking heat into a desk that cannot absorb it fast enough. Where a curve flattens at 100&nbsp;°C on the chip view, that machine has started throttling — it is holding temperature by doing less work, which the “work sustained” figure shows.</p>
+  <p><b>What is being solved.</b> Two transient cases step together. Solids are lumped RC nodes — chip, chassis, and twenty slices of the stand along the flow path. Air is marched slice by slice. Channel flow comes from a pressure balance: buoyancy against viscous loss when passive, fan curve against system curve when active. The desk is a semi-infinite solid under transient flux, which is why a steel desk behaves nothing like oak. One constant is fitted so a bare machine on wood reaches 46&nbsp;°C case and 95&nbsp;°C chip after 45 minutes at 16&nbsp;W and 22&nbsp;°C. Not CFD — it resolves temperature along the channel, not across the machine, so no hot spots and no recirculation. Compare configurations with it; do not quote absolute numbers from it.</p>
+</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+/* ============================================================
+   PHYS — thermal solver for a MacBook Air 13.6" M3 on a
+   corrugated aluminium cooling wedge.
+
+   Lumped RC network for the solids + a 1-D finite-volume march
+   of the air along the channel. Transient, with SoC throttling.
+
+   Desk is modelled as a semi-infinite solid under constant flux
+   (effusivity sqrt(k.rho.c)), not a fixed resistance — a desk
+   never reaches its steady spreading limit inside a work session,
+   and this is what makes a steel desk behave differently from oak.
+
+   Calibrated so that: 16 W, 22 C ambient, wooden desk, t = 20 min
+   -> bottom case ~46 C, which is what the machine measures at.
+   ============================================================ */
+var PHYS = (function(){
+'use strict';
+var SIG=5.670e-8, G=9.81, CP=1007;
+
+function air(TK){
+  return { rho:353.0/TK, mu:1.458e-6*Math.pow(TK,1.5)/(TK+110.4),
+           k:0.0242*Math.pow(TK/273.15,0.85), cp:CP, beta:1.0/TK };
+}
+function nu(a){ return a.mu/a.rho; }
+function alpha(a){ return a.k/(a.rho*a.cp); }
+
+/* ---- laptop ---- */
+var LAP_W=0.3041, LAP_D=0.215, LAP_T=0.0113;
+var A_BOT=LAP_W*LAP_D;
+var A_DECK=0.042;            /* keyboard + palmrest, derated for keys and hands */
+var DECK_EFF=0.78;           /* calibration: keys insulate, screen shades, wrists rest */
+var A_SIDE=2*(LAP_W+LAP_D)*LAP_T*0.6;
+var EPS_AL=0.85;
+var R_INT=3.2;               /* K/W junction -> chassis */
+var C_JUNC=120, C_CHAS=520;  /* J/K */
+var CAL_SURF=0.46;           /* single fitted constant: keys, palms and the
+                                lid all shade the deck. Tuned so a bare machine on
+                                a wooden desk reaches 46 C skin / 95 C junction after
+                                45 min at 16 W and 22 C ambient. */
+var TJ_LIMIT=100;
+
+/* ---- stand ---- */
+var W_S=0.280, T_SKIN=0.0010, T_FIN=0.0004;
+var K_AL=200, RHO_AL=2700, C_AL=900;
+var EPS_STAND=0.88;
+var H_CONTACT=800;           /* laptop underside -> top skin, via a thin soft pad */
+var H_BASE=150;              /* stand base plate -> desk, unclamped flat contact */
+
+var DESKS={
+  wood:     {k:0.15, rhoc:1.70e6, eps:0.90, label:'Wood'},
+  laminate: {k:0.22, rhoc:1.90e6, eps:0.90, label:'Laminate'},
+  glass:    {k:1.05, rhoc:2.10e6, eps:0.92, label:'Glass'},
+  steel:    {k:45.0, rhoc:3.90e6, eps:0.35, label:'Steel'}
+};
+/* transient surface conductance of a semi-infinite desk, W/m2K */
+function deskH(desk,t){
+  var e=Math.sqrt(desk.k*desk.rhoc);
+  var h=0.5*Math.sqrt(Math.PI/Math.max(t,20))*e;
+  var steady=4*desk.k*Math.sqrt(A_BOT/Math.PI)/A_BOT;
+  return Math.max(h,steady);
+}
+
+/* ---- correlations ---- */
+function hPlateUp(dT,L,a){
+  if(dT<=0) return 0;
+  var Ra=G*a.beta*dT*L*L*L/(nu(a)*alpha(a));
+  return (Ra<1e7?0.54*Math.pow(Ra,0.25):0.15*Math.pow(Ra,1/3))*a.k/L;
+}
+function hPlateDown(dT,L,a){
+  if(dT<=0) return 0;
+  var Ra=G*a.beta*dT*L*L*L/(nu(a)*alpha(a));
+  return 0.52*Math.pow(Ra,0.20)*a.k/L;
+}
+function hVert(dT,L,a){
+  if(dT<=0) return 0;
+  var Ra=G*a.beta*dT*L*L*L/(nu(a)*alpha(a)), Pr=nu(a)/alpha(a);
+  return (0.68+0.670*Math.pow(Ra,0.25)/Math.pow(1+Math.pow(0.492/Pr,9/16),4/9))*a.k/L;
+}
+function hRad(e1,e2,TmK){ return 4*SIG*Math.pow(TmK,3)/(1/e1+1/e2-1); }
+function hRadOpen(e,TmK){ return 4*e*SIG*Math.pow(TmK,3); }
+function viewFactor(a,b,c){
+  var X=a/c,Y=b/c,x2=X*X,y2=Y*Y;
+  var t1=Math.log(Math.sqrt((1+x2)*(1+y2)/(1+x2+y2)));
+  var t2=X*Math.sqrt(1+y2)*Math.atan(X/Math.sqrt(1+y2));
+  var t3=Y*Math.sqrt(1+x2)*Math.atan(Y/Math.sqrt(1+x2));
+  return Math.min(1,2/(Math.PI*X*Y)*(t1+t2+t3-X*Math.atan(X)-Y*Math.atan(Y)));
+}
+
+/* ---- geometry from the sliders ---- */
+function geometry(p){
+  var tan=p.rearH/LAP_D;
+  var Ds=LAP_D*p.coverage;
+  var Hf=(LAP_D-Ds)*tan, Hr=p.rearH;
+  var hCoreF=Math.max(Hf-2*T_SKIN,0.002), hCoreR=Math.max(Hr-2*T_SKIN,0.004);
+  var hMean=0.5*(hCoreF+hCoreR);
+  var nHalf=Math.max(2,Math.round(W_S/(p.pitch/2)));
+  var nChan=2*nHalf;
+  var Acell=0.5*(p.pitch/2)*hMean;
+  var slant=Math.sqrt(Math.pow(p.pitch/2,2)+hMean*hMean);
+  var Pcell=(p.pitch/2)+2*slant;
+  var mass=(2*W_S*Ds*T_SKIN + nHalf*2*slant*Ds*T_FIN)*RHO_AL;
+  return {tan:tan,Ds:Ds,Hf:Hf,Hr:Hr,hMean:hMean,nChan:nChan,
+          Dh:4*Acell/Pcell, Aflow:nChan*Acell, Awet:nChan*Pcell*Ds,
+          slant:slant, mass:mass, Axc:W_S*2*T_SKIN+nHalf*2*T_FIN*hMean,
+          Acover:A_BOT*p.coverage, Aopen:A_BOT*(1-p.coverage),
+          Abase:W_S*Ds, Aside:2*Ds*hMean, Arear:W_S*Hr, Afront:W_S*Hf};
+}
+
+/* ---- flow: buoyancy balance, or fan-curve intersection ---- */
+function solveFlow(g,p,dTair,TfilmK){
+  var a=air(TfilmK), fRe=53;
+  var Rv=fRe*a.mu*g.Ds/(2*g.Dh*g.Dh);
+  if(p.active){
+    var Qmax=p.fanCFM/2118.9, lo=1e-9, hi=Qmax*0.999, Qv=0;
+    for(var i=0;i<70;i++){
+      Qv=0.5*(lo+hi);
+      var V=Qv/g.Aflow;
+      var sys=Rv*V + 2.5*0.5*a.rho*V*V;
+      if(sys < p.fanPa*(1-Math.pow(Qv/Qmax,2))) lo=Qv; else hi=Qv;
+    }
+    return {V:Qv/g.Aflow, mdot:a.rho*Qv, a:a};
+  }
+  var dz=Math.max(0.5*(g.Hr-g.Hf),0.0005);
+  var dp=a.rho*G*a.beta*Math.max(dTair,0)*dz;
+  var V=Math.min(dp/Math.max(Rv,1e-9),0.6);
+  return {V:V, mdot:a.rho*g.Aflow*V, a:a};
+}
+function hChannel(g,V,a){
+  var Re=a.rho*V*g.Dh/a.mu, Pr=nu(a)/alpha(a);
+  var Gz=(g.Dh/g.Ds)*Re*Pr;
+  var Nu=3.0+0.085*Gz/(1+0.047*Math.pow(Math.max(Gz,1e-9),0.67));
+  if(Re>2300) Nu=Math.max(Nu,0.023*Math.pow(Re,0.8)*Math.pow(Pr,0.4));
+  return Nu*a.k/g.Dh;
+}
+function finEff(h){
+  var m=Math.sqrt(2*h/(K_AL*T_FIN)), mL=m*0.010;
+  return mL>1e-6?Math.tanh(mL)/mL:1;
+}
+
+/* ---- state ---- */
+var NSL=20;
+function makeCase(onStand,p){
+  var s={onStand:onStand,Tj:p.ambient,Tc:p.ambient,Tdesk:p.ambient,
+         Ts:new Float64Array(NSL),Ta:new Float64Array(NSL+1),qs:new Float64Array(NSL),
+         throttle:1,power:p.load,flowV:0,mdot:0,Tout:p.ambient,t:0,Cbot:0,
+         q:{contact:0,rad:0,air:0,deck:0,sides:0,desk:0}};
+  s.Ts.fill(p.ambient); s.Ta.fill(p.ambient);
+  return s;
+}
+
+function step(s,p,g,dt){
+  var Tamb=p.ambient, desk=DESKS[p.desk];
+
+  /* throttle controller — the SoC pulls power back to hold the junction */
+  s.throttle += -0.030*(s.Tj-TJ_LIMIT)*dt;
+  s.throttle = Math.max(0.30,Math.min(1,s.throttle));
+  s.power = p.load*s.throttle;
+
+  var dTc=Math.max(s.Tc-Tamb,0.01), TmK=(s.Tc+Tamb)/2+273.15, aR=air(TmK);
+  var Lc=A_BOT/(2*(LAP_W+LAP_D));
+  var C_deck=(hPlateUp(dTc,Lc,aR)+hRadOpen(EPS_AL,TmK))*A_DECK*DECK_EFF*CAL_SURF;
+  var C_sides=(hVert(dTc,LAP_T,aR)+hRadOpen(EPS_AL,TmK))*A_SIDE*CAL_SURF;
+  var Q_deck=C_deck*dTc, Q_sides=C_sides*dTc;
+  var hD=deskH(desk,s.t);
+  var Q_contact=0,Q_rad=0,Q_air=0,Q_desk=0;
+
+  if(!s.onStand){
+    /* ---------- bare desk: trapped 4 mm layer, heated from above ---------- */
+    var hGap=aR.k/0.004;                       /* stably stratified -> Nu = 1 */
+    var hTot=1/(1/(hGap+hRad(EPS_AL,desk.eps,TmK))+1/hD);
+    Q_desk=hTot*A_BOT*dTc;
+    s.Tdesk=Tamb+Q_desk/(hD*A_BOT);
+    s.flowV=0; s.mdot=0; s.Tout=Tamb; s.Cbot=hTot*A_BOT;
+  } else {
+    /* ---------- on the stand ---------- */
+    var flow=solveFlow(g,p,Math.max(s.Tout-Tamb,0.05),TmK);
+    var hCh=hChannel(g,flow.V,flow.a), eta=finEff(hCh);
+    s.flowV=flow.V; s.mdot=flow.mdot;
+    var Cf=s.mdot*CP, AwetSl=g.Awet/NSL;
+
+    /* march the air front -> rear, slice by slice */
+    s.Ta[0]=Tamb; Q_air=0;
+    for(var i=0;i<NSL;i++){
+      if(Cf>1e-12){
+        s.Ta[i+1]=s.Ts[i]-(s.Ts[i]-s.Ta[i])*Math.exp(-hCh*AwetSl*eta/Cf);
+        s.qs[i]=Cf*(s.Ta[i+1]-s.Ta[i]);
+      } else { s.Ta[i+1]=s.Ts[i]; s.qs[i]=0; }
+      Q_air+=s.qs[i];
+    }
+    s.Tout=s.Ta[NSL];
+
+    var C_cont=H_CONTACT*(g.Acover/NSL);
+    var C_slice=g.mass*C_AL/NSL;
+    var C_lat=K_AL*g.Axc/(g.Ds/NSL);
+    var C_baseSl=(1/(1/H_BASE+1/hD))*(g.Abase/NSL);
+    var TsAvg=0; for(var m=0;m<NSL;m++) TsAvg+=s.Ts[m]; TsAvg/=NSL;
+    var dTs=Math.max(TsAvg-Tamb,0.01);
+    var hSide=hVert(dTs,Math.max(g.hMean,0.004),aR)+hRadOpen(EPS_STAND,TmK);
+    var C_sideSl=hSide*(g.Aside/NSL);
+    /* the tall rear face and the raked front face both see the room */
+    var C_ends=(hVert(dTs,Math.max(g.Hr,0.006),aR)+hRadOpen(EPS_STAND,TmK))*(g.Arear+g.Afront);
+
+    var newTs=new Float64Array(NSL);
+    Q_desk=0;
+    for(var j=0;j<NSL;j++){
+      var qIn=C_cont*(s.Tc-s.Ts[j]); Q_contact+=qIn;
+      var qBase=C_baseSl*(s.Ts[j]-Tamb); Q_desk+=qBase;
+      var qSide=C_sideSl*(s.Ts[j]-Tamb);
+      var qEnd=(j===NSL-1?C_ends*0.75:(j===0?C_ends*0.25:0))*(s.Ts[j]-Tamb);
+      var qLat=0;
+      if(j>0)     qLat+=C_lat*(s.Ts[j-1]-s.Ts[j]);
+      if(j<NSL-1) qLat+=C_lat*(s.Ts[j+1]-s.Ts[j]);
+      newTs[j]=s.Ts[j]+dt*(qIn-s.qs[j]-qSide-qBase-qEnd+qLat)/C_slice;
+    }
+    s.Ts.set(newTs);
+    s.Tdesk=Tamb+Q_desk/Math.max(hD*g.Abase,1e-6);
+
+    /* the uncovered front underside sits over an open wedge */
+    var Fv=viewFactor(LAP_W,Math.max(LAP_D*(1-p.coverage),0.01),Math.max(g.Hf*0.5,0.002));
+    var C_open=hRad(EPS_AL,desk.eps,TmK)*g.Aopen*Fv
+             + hRadOpen(EPS_AL,TmK)*g.Aopen*(1-Fv)
+             + hPlateDown(dTc,Lc,aR)*g.Aopen;
+    Q_rad=C_open*dTc;
+    s.Cbot=(Q_contact+Q_rad)/dTc;
+  }
+
+  var Q_bottom = s.onStand ? (Q_contact+Q_rad) : Q_desk;
+  var Q_jc=(s.Tj-s.Tc)/R_INT;
+  s.Tc += dt*(Q_jc-Q_deck-Q_sides-Q_bottom)/C_CHAS;
+  s.Tj += dt*(s.power-Q_jc)/C_JUNC;
+  s.t  += dt;
+  s.q.contact=Q_contact; s.q.rad=Q_rad; s.q.air=Q_air;
+  s.q.deck=Q_deck; s.q.sides=Q_sides; s.q.desk=Q_desk;
+  return s;
+}
+
+return {setCal:function(c,m){CAL_SURF=c; if(m) C_CHAS=m;}, geometry:geometry, makeCase:makeCase, step:step, DESKS:DESKS,
+        NSL:NSL, TJ_LIMIT:TJ_LIMIT, LAP_W:LAP_W, LAP_D:LAP_D, LAP_T:LAP_T, W_S:W_S};
+})();
+(function(){
+'use strict';
+var RM=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+var NSL=PHYS.NSL;
+
+/* ---------- live parameters (SI) ---------- */
+var P={ambient:30, load:16, active:false, coverage:0.55, rearH:0.030,
+       pitch:0.014, fanPa:45, fanCFM:3, desk:'wood'};
+var G=PHYS.geometry(P);
+var cDesk=PHYS.makeCase(false,P), cStand=PHYS.makeCase(true,P);
+
+/* ---------- scene ---------- */
+var LW=PHYS.LAP_W*1000, LD=PHYS.LAP_D*1000, LT=PHYS.LAP_T*1000, WS=PHYS.W_S*1000;
+var FZ=LD/2, RZ=-LD/2;
+var MOD_W=200, MOD_D=36;
+function tok(n){ return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
+
+var cv=document.getElementById('cv'), stage=document.getElementById('stage');
+var renderer=new THREE.WebGLRenderer({canvas:cv,antialias:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.outputEncoding=THREE.sRGBEncoding;
+renderer.shadowMap.enabled=true; renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+var scene=new THREE.Scene();
+var camera=new THREE.PerspectiveCamera(34,16/8.4,1,4000);
+var clipPlane=new THREE.Plane(new THREE.Vector3(-1,0,0),0);
+
+var hemi=new THREE.HemisphereLight(0xffffff,0x404850,.7); scene.add(hemi);
+var key=new THREE.DirectionalLight(0xffffff,.9); key.position.set(320,480,300);
+key.castShadow=true; key.shadow.mapSize.set(2048,2048);
+var sc=key.shadow.camera; sc.left=-400; sc.right=400; sc.top=400; sc.bottom=-400; sc.near=10; sc.far=1400;
+scene.add(key);
+var fill=new THREE.DirectionalLight(0xffffff,.32); fill.position.set(-350,240,-260); scene.add(fill);
+var rim=new THREE.DirectionalLight(0xffffff,.26); rim.position.set(0,120,-420); scene.add(rim);
+
+function M(o){ return new THREE.MeshStandardMaterial(o); }
+var matLaptop=M({color:0xb9c0c4,metalness:.82,roughness:.34});
+var matSkin  =M({color:0x6d777d,metalness:.75,roughness:.45,side:THREE.DoubleSide});
+var matCore  =M({color:0x8b959b,metalness:.80,roughness:.40,side:THREE.DoubleSide});
+var matStand =M({color:0x5d666c,metalness:.72,roughness:.52,side:THREE.DoubleSide});
+var matDark  =M({color:0x1c2226,metalness:.30,roughness:.68});
+var matScreen=M({color:0x0d1114,metalness:.10,roughness:.28});
+var matModule=M({color:0x3d4449,metalness:.55,roughness:.58,side:THREE.DoubleSide});
+var matBlade =M({color:0xd3d9dc,metalness:.35,roughness:.55,side:THREE.DoubleSide});
+var matMag   =M({color:0x8e5030,metalness:.65,roughness:.50});
+var matGround=M({color:0xe6eaec,metalness:0,roughness:.96});
+var matLed   =new THREE.MeshBasicMaterial({color:0x54d18a});
+function thermalMat(){ return M({vertexColors:true,color:0xffffff,metalness:.18,roughness:.62,side:THREE.DoubleSide}); }
+
+var ground=new THREE.Mesh(new THREE.PlaneGeometry(2600,2600),matGround);
+ground.rotation.x=-Math.PI/2; ground.position.y=-.4; ground.receiveShadow=true; scene.add(ground);
+var grid=new THREE.GridHelper(2400,48); grid.position.y=-.3;
+grid.material.transparent=true; grid.material.opacity=.5; grid.material.vertexColors=false; scene.add(grid);
+
+/* ---------- paintable registry ---------- */
+var paint=[];                                  /* {mesh, u:Float32Array, kind} */
+function registerU(mesh,kind,toU){
+  var pos=mesh.geometry.attributes.position, n=pos.count, u=new Float32Array(n);
+  for(var i=0;i<n;i++) u[i]=Math.max(0,Math.min(1,toU(pos.getX(i),pos.getY(i),pos.getZ(i))));
+  mesh.geometry.setAttribute('color',new THREE.BufferAttribute(new Float32Array(n*3),3));
+  mesh.userData.matNormal=mesh.material;
+  mesh.userData.matThermal=thermalMat();
+  paint.push({mesh:mesh,u:u,kind:kind});
+}
+var RAMP=[[0x1B,0x32,0x78],[0x1E,0x8C,0xBE],[0x50,0xBE,0x8C],[0xEB,0xCD,0x5A],[0xF0,0x8C,0x37],[0xD7,0x37,0x2D]];
+function ramp(t,out){
+  t=Math.max(0,Math.min(.9999,t)); var f=t*(RAMP.length-1), i=Math.floor(f), g=f-i;
+  var a=RAMP[i], b=RAMP[i+1];
+  out[0]=Math.pow(((a[0]+(b[0]-a[0])*g)/255),2.2);
+  out[1]=Math.pow(((a[1]+(b[1]-a[1])*g)/255),2.2);
+  out[2]=Math.pow(((a[2]+(b[2]-a[2])*g)/255),2.2);
+}
+
+/* ---------- laptop ---------- */
+var lapPivot=new THREE.Group(); lapPivot.position.set(0,0,FZ); scene.add(lapPivot);
+var base=new THREE.Mesh(new THREE.BoxGeometry(LW,LT,LD,1,1,18),matLaptop);
+base.position.set(0,LT/2,-LD/2); base.castShadow=true; lapPivot.add(base);
+registerU(base,'lap',function(x,y,z){ return .5 - z/LD; });
+var kb=new THREE.Mesh(new THREE.BoxGeometry(LW*.72,1,LD*.42),matDark);
+kb.position.set(0,LT+.3,-LD*.62); lapPivot.add(kb);
+var tp=new THREE.Mesh(new THREE.BoxGeometry(LW*.35,1,LD*.24),matDark);
+tp.position.set(0,LT+.3,-LD*.21); lapPivot.add(tp);
+var lid=new THREE.Group(); lid.position.set(0,LT,-LD); lid.rotation.x=-105*Math.PI/180; lapPivot.add(lid);
+var lidMesh=new THREE.Mesh(new THREE.BoxGeometry(LW,6,208),matLaptop);
+lidMesh.position.set(0,0,104); lidMesh.castShadow=true; lid.add(lidMesh);
+var screenM=new THREE.Mesh(new THREE.BoxGeometry(LW-22,1,190),matScreen);
+screenM.position.set(0,-3.4,104); lid.add(screenM);
+
+/* ---------- stand (rebuilt when geometry changes) ---------- */
+var stand=new THREE.Group(); scene.add(stand);
+var SG={};
+function disposeGroup(g){
+  for(var i=g.children.length-1;i>=0;i--){
+    var c=g.children[i];
+    if(c.geometry) c.geometry.dispose();
+    g.remove(c);
+  }
+}
+function buildStand(){
+  for(var i=paint.length-1;i>=0;i--) if(paint[i].kind!=='lap') paint.splice(i,1);
+  disposeGroup(stand);
+  var rearH=P.rearH*1000, tan=rearH/LD;
+  var z0=FZ-LD*P.coverage, z1=RZ, depth=z0-z1, midZ=(z0+z1)/2;
+  var frontH=(FZ-z0)*tan, skin=1.0, pitch=P.pitch*1000;
+  SG={z0:z0,z1:z1,rearH:rearH,frontH:frontH,tan:tan,midZ:midZ,depth:depth};
+  lapPivot.rotation.x=Math.atan(tan);
+  var uOf=function(z){ return (z0-z)/Math.max(depth,1e-6); };
+
+  var slant=depth/Math.cos(Math.atan(tan));
+  var top=new THREE.Mesh(new THREE.BoxGeometry(WS,skin,slant,1,1,20),matSkin);
+  top.rotation.x=Math.atan(tan);
+  top.position.set(0,(FZ-midZ)*tan-skin/2*Math.cos(Math.atan(tan)),midZ);
+  top.castShadow=true; stand.add(top);
+  registerU(top,'stand',function(x,y,z){ return uOf(midZ+z*Math.cos(Math.atan(tan))); });
+
+  var bot=new THREE.Mesh(new THREE.BoxGeometry(WS,skin,depth,1,1,20),matSkin);
+  bot.position.set(0,skin/2,midZ); bot.receiveShadow=true; stand.add(bot);
+  registerU(bot,'stand',function(x,y,z){ return uOf(midZ+z); });
+
+  var nz=14, half=pitch/2, nk=Math.max(4,Math.round(WS/half)), pos=[], idx=[];
+  for(var k=0;k<=nk;k++){
+    var x=-WS/2+k*half;
+    for(var j=0;j<=nz;j++){
+      var z=z1+(j/nz)*(z0-z1);
+      pos.push(x,(k%2===0)?skin:(FZ-z)*tan-skin,z);
+    }
+  }
+  for(var k2=0;k2<nk;k2++) for(var j2=0;j2<nz;j2++){
+    var a=k2*(nz+1)+j2,b=(k2+1)*(nz+1)+j2,c=(k2+1)*(nz+1)+j2+1,d=k2*(nz+1)+j2+1;
+    idx.push(a,b,c,a,c,d);
+  }
+  var cg=new THREE.BufferGeometry();
+  cg.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));
+  cg.setIndex(idx); cg.computeVertexNormals();
+  var core=new THREE.Mesh(cg,matCore); core.castShadow=true; stand.add(core);
+  registerU(core,'stand',function(x,y,z){ return uOf(z); });
+
+  [-1,1].forEach(function(s){
+    var sh=new THREE.Shape();
+    sh.moveTo(z1,0); sh.lineTo(z0,0); sh.lineTo(z0,frontH); sh.lineTo(z1,rearH);
+    var m=new THREE.Mesh(new THREE.ExtrudeGeometry(sh,{depth:2.4,bevelEnabled:false}),matStand);
+    m.rotation.y=-Math.PI/2; m.position.set(s>0?WS/2:-WS/2+2.4,0,0);
+    m.castShadow=true; stand.add(m);
+  });
+  var dock=new THREE.Mesh(new THREE.BoxGeometry(WS,rearH,2.2),matStand);
+  dock.position.set(0,rearH/2,z1-1.1); stand.add(dock);
+  [-1,1].forEach(function(s){
+    var mg=new THREE.Mesh(new THREE.CylinderGeometry(7,7,2.6,18),matMag);
+    mg.rotation.x=Math.PI/2; mg.position.set(s*100,rearH/2,z1-2.4); stand.add(mg);
+  });
+  applyThermalMode();
+}
+
+/* ---------- fan module ---------- */
+var module_=new THREE.Group(); module_.visible=false; scene.add(module_);
+var fans=[], led;
+(function(){
+  var H=30;
+  var shell=new THREE.Mesh(new THREE.BoxGeometry(MOD_W,H,MOD_D),matModule);
+  shell.position.y=H/2; shell.castShadow=true; module_.add(shell);
+  [-62,0,62].forEach(function(fx){
+    var rotor=new THREE.Group(); rotor.position.set(fx,H/2,-MOD_D/2+7); module_.add(rotor); fans.push(rotor);
+    for(var b=0;b<7;b++){
+      var bl=new THREE.Mesh(new THREE.BoxGeometry(11.5,.7,3.4),matBlade);
+      bl.position.set(Math.cos(b/7*6.2832)*7.2,Math.sin(b/7*6.2832)*7.2,0);
+      bl.rotation.z=b/7*6.2832; bl.rotation.y=.42; rotor.add(bl);
+    }
+    [-MOD_D/2+1.2,MOD_D/2-1.2].forEach(function(zz){
+      var r=new THREE.Mesh(new THREE.TorusGeometry(12.6,.9,8,24),matStand);
+      r.position.set(fx,H/2,zz); module_.add(r);
+    });
+  });
+  [-1,1].forEach(function(s){
+    var mg=new THREE.Mesh(new THREE.CylinderGeometry(7,7,2.6,18),matMag);
+    mg.rotation.x=Math.PI/2; mg.position.set(s*100,H/2,MOD_D/2+1.2); module_.add(mg);
+  });
+  led=new THREE.Mesh(new THREE.SphereGeometry(2,10,10),matLed);
+  led.position.set(MOD_W/2-9,H-5,-MOD_D/2+1); module_.add(led);
+})();
+
+/* ---------- airflow particles ---------- */
+var NP=700, st=[], pPos=new Float32Array(NP*3), pCol=new Float32Array(NP*3);
+function reseed(i,fresh){ st[i]={u:fresh?Math.random():-Math.random()*.25,
+  lane:-WS/2+8+Math.random()*(WS-16), hgt:.2+Math.random()*.6,
+  side:Math.random()<.28, jit:(Math.random()-.5)*7, spd:.8+Math.random()*.45}; }
+for(var i0=0;i0<NP;i0++) reseed(i0,true);
+var sprite=(function(){
+  var c=document.createElement('canvas'); c.width=c.height=64;
+  var g=c.getContext('2d'), rg=g.createRadialGradient(32,32,0,32,32,32);
+  rg.addColorStop(0,'rgba(255,255,255,1)'); rg.addColorStop(.42,'rgba(255,255,255,.55)');
+  rg.addColorStop(1,'rgba(255,255,255,0)'); g.fillStyle=rg; g.fillRect(0,0,64,64);
+  return new THREE.CanvasTexture(c);
+})();
+var pGeo=new THREE.BufferGeometry();
+pGeo.setAttribute('position',new THREE.BufferAttribute(pPos,3));
+pGeo.setAttribute('color',new THREE.BufferAttribute(pCol,3));
+var points=new THREE.Points(pGeo,new THREE.PointsMaterial({size:5.2,map:sprite,transparent:true,
+  opacity:.95,depthWrite:false,vertexColors:true,sizeAttenuation:true}));
+scene.add(points);
+var cCool=new THREE.Color(), cHot=new THREE.Color(), cT=new THREE.Color();
+function airColors(){ cCool.set(tok('--cool')||'#1E88B8'); cHot.set(tok('--hot')||'#C9651C'); }
+
+function chanY(z){ return 1 + Math.max((FZ-z)*SG.tan-2,1)*0.5; }
+function chanH(z){ return Math.max((FZ-z)*SG.tan-2,1); }
+function stepAir(dt){
+  /* speed follows the solved channel velocity, mapped to something watchable */
+  var v=cStand.flowV, base=P.active?Math.min(.9,.18+v*2.2):Math.max(.022,Math.min(.14,v*22));
+  if(RM) base*=.35;
+  for(var i=0;i<NP;i++){
+    var s=st[i]; s.u+=dt*base*s.spd;
+    if(s.u>1.18) reseed(i,false);
+    var u=s.u,x,y,z,heat;
+    if(u<0){ x=s.lane; z=SG.z0+(-u)*260; y=1+s.hgt*6; heat=0; }
+    else if(u<.20){ var t=u/.20; z=SG.z0+(1-t)*62;
+      x=s.side?s.lane*(1+(1-t)*.55):s.lane; y=1.5+s.hgt*(4+t*(chanH(SG.z0)-4)); heat=0; }
+    else if(u<.80){ var t2=(u-.20)/.60; z=SG.z0+t2*(SG.z1-SG.z0);
+      x=s.side?s.lane*(1-.30*Math.min(t2*2.2,1)):s.lane;
+      y=chanY(z)+(s.hgt-.5)*chanH(z)*.74; heat=t2*.92; }
+    else { var t3=(u-.80)/.38; z=SG.z1-t3*(P.active?150:74);
+      x=s.lane*(P.active?1:1+t3*.30)+s.jit*t3;
+      y=chanY(SG.z1)+(s.hgt-.5)*chanH(SG.z1)*.74+(P.active?t3*10:t3*t3*74); heat=1; }
+    pPos[i*3]=x; pPos[i*3+1]=y; pPos[i*3+2]=z;
+    cT.copy(cCool).lerp(cHot,Math.max(0,Math.min(1,heat)));
+    pCol[i*3]=cT.r; pCol[i*3+1]=cT.g; pCol[i*3+2]=cT.b;
+  }
+  pGeo.attributes.position.needsUpdate=true; pGeo.attributes.color.needsUpdate=true;
+}
+
+/* ---------- thermal painting ---------- */
+var thermal=true, scaleLo=P.ambient, scaleHi=P.ambient+25, rgb=[0,0,0];
+function applyThermalMode(){
+  paint.forEach(function(e){
+    e.mesh.material = thermal ? e.mesh.userData.matThermal : e.mesh.userData.matNormal;
+    e.mesh.material.transparent=section; e.mesh.material.opacity=section&&e.kind==='lap'?.28:1;
+    e.mesh.material.depthWrite=!(section&&e.kind==='lap');
+    e.mesh.material.needsUpdate=true;
+  });
+}
+function repaint(){
+  if(!thermal) return;
+  var Tc=cStand.Tc, Tamb=P.ambient;
+  var spread=Math.min(7,Math.max(0,(Tc-Tamb)*.3));
+  var peak=Math.max(Tc+spread,cStand.Ts[NSL-1],cDesk.Tc)+2;
+  scaleLo+= (Tamb-scaleLo)*.1; scaleHi+= (Math.max(Tamb+12,peak)-scaleHi)*.05;
+  var span=Math.max(scaleHi-scaleLo,1);
+  paint.forEach(function(e){
+    var col=e.mesh.geometry.attributes.color, n=col.count;
+    for(var i=0;i<n;i++){
+      var u=e.u[i], T;
+      if(e.kind==='lap') T=Tc+spread*(2*u-1);
+      else { var f=u*(NSL-1), k=Math.floor(f), g=f-k;
+             T=cStand.Ts[k]+(cStand.Ts[Math.min(k+1,NSL-1)]-cStand.Ts[k])*g; }
+      ramp((T-scaleLo)/span,rgb);
+      col.setXYZ(i,rgb[0],rgb[1],rgb[2]);
+    }
+    col.needsUpdate=true;
+  });
+  document.getElementById('scLo').textContent=scaleLo.toFixed(0)+' °C';
+  document.getElementById('scHi').textContent=scaleHi.toFixed(0)+' °C';
+}
+
+/* ---------- dimension callouts ---------- */
+var labelBox=document.getElementById('labels'), labelEls=[], showLabels=true;
+var LDEF=[
+  function(){ return {t:SG.rearH.toFixed(0)+' mm rear', p:[WS/2+18,SG.rearH/2,SG.z1+6]}; },
+  function(){ return {t:SG.frontH.toFixed(1)+' mm intake', p:[-WS/2-32,SG.frontH/2,SG.z0-4]}; },
+  function(){ return {t:(P.coverage*100).toFixed(0)+'% coverage', p:[0,-8,SG.midZ]}; },
+  function(){ return {t:(Math.atan(SG.tan)*180/Math.PI).toFixed(1)+'° tilt', p:[LW/2+24,SG.frontH*.7,FZ-58]}; },
+  function(){ return {t:(P.pitch*1000).toFixed(0)+' mm pitch · '+G.nChan+' ch', p:[-56,SG.rearH+13,SG.z1+18]}; },
+  function(){ return {t:'module', p:[MOD_W/2+22,15,RZ-MOD_D/2-1], mod:true}; }
+];
+LDEF.forEach(function(){ var e=document.createElement('div'); e.className='lab';
+  labelBox.appendChild(e); labelEls.push(e); });
+var pv=new THREE.Vector3();
+function updateLabels(){
+  var w=stage.clientWidth,h=stage.clientHeight;
+  LDEF.forEach(function(fn,i){
+    var d=fn(), e=labelEls[i];
+    if(!showLabels||(d.mod&&!P.active)){ e.style.opacity=0; return; }
+    pv.set(d.p[0],d.p[1],d.p[2]).project(camera);
+    if(pv.z>1){ e.style.opacity=0; return; }
+    if(e.textContent!==d.t) e.textContent=d.t;
+    e.style.opacity=1;
+    e.style.left=((pv.x*.5+.5)*w)+'px'; e.style.top=((-pv.y*.5+.5)*h)+'px';
+  });
+}
+
+/* ---------- orbit ---------- */
+var tgt=new THREE.Vector3(0,20,-10), curTgt=tgt.clone();
+var sph={r:740,th:.72,ph:1.06}, goal={r:740,th:.72,ph:1.06};
+var VIEWS={iso:{th:.72,ph:1.06,r:740}, front:{th:0,ph:1.30,r:680},
+           side:{th:Math.PI/2,ph:1.36,r:650}, rear:{th:Math.PI*.96,ph:1.10,r:690}};
+var drag=null;
+cv.addEventListener('pointerdown',function(e){ cv.setPointerCapture(e.pointerId);
+  drag={x:e.clientX,y:e.clientY,pan:e.shiftKey||e.button===2}; });
+cv.addEventListener('pointermove',function(e){
+  if(!drag) return; var dx=e.clientX-drag.x, dy=e.clientY-drag.y; drag.x=e.clientX; drag.y=e.clientY;
+  if(drag.pan){
+    var r=new THREE.Vector3().setFromMatrixColumn(camera.matrix,0);
+    var u=new THREE.Vector3().setFromMatrixColumn(camera.matrix,1);
+    tgt.addScaledVector(r,-dx*sph.r*.0012).addScaledVector(u,dy*sph.r*.0012);
+  } else { goal.th-=dx*.0062; goal.ph=Math.max(.14,Math.min(1.52,goal.ph-dy*.0052)); }
+});
+['pointerup','pointercancel','pointerleave'].forEach(function(ev){ cv.addEventListener(ev,function(){drag=null;}); });
+cv.addEventListener('contextmenu',function(e){e.preventDefault();});
+cv.addEventListener('wheel',function(e){ e.preventDefault();
+  goal.r=Math.max(230,Math.min(1500,goal.r*(1+Math.sign(e.deltaY)*.10))); },{passive:false});
+document.querySelectorAll('[data-view]').forEach(function(b){ b.addEventListener('click',function(){
+  var v=VIEWS[b.dataset.view]; goal.th=v.th; goal.ph=v.ph; goal.r=v.r; tgt.set(0,20,-10); }); });
+
+/* ---------- history for the chart ---------- */
+var H={t:[],ds:[],ss:[],dj:[],sj:[]}, lastSample=-99;
+function sample(){
+  H.t.push(cStand.t/60); H.ds.push(cDesk.Tc); H.ss.push(cStand.Tc);
+  H.dj.push(cDesk.Tj);  H.sj.push(cStand.Tj);
+  if(H.t.length>3600){ ['t','ds','ss','dj','sj'].forEach(function(k){
+    var a=H[k], o=[]; for(var i=0;i<a.length;i+=2) o.push(a[i]); H[k]=o; }); }
+}
+function clearHistory(){ H={t:[],ds:[],ss:[],dj:[],sj:[]}; lastSample=-99; }
+
+/* ---------- controls ---------- */
+var section=false, running=false, speed=300, modAnim=0, spin=0, plot='skin';
+function press(el,on){ el.setAttribute('aria-pressed',String(on)); }
+function resetSim(){ cDesk=PHYS.makeCase(false,P); cStand=PHYS.makeCase(true,P); clearHistory(); }
+
+var bRun=document.getElementById('bRun');
+bRun.addEventListener('click',function(){ running=!running; bRun.textContent=running?'Pause':'Run'; });
+document.getElementById('bReset').addEventListener('click',resetSim);
+document.querySelectorAll('[data-spd]').forEach(function(b){ b.addEventListener('click',function(){
+  speed=+b.dataset.spd; document.querySelectorAll('[data-spd]').forEach(function(o){ press(o,o===b); }); }); });
+document.querySelectorAll('[data-plot]').forEach(function(b){ b.addEventListener('click',function(){
+  plot=b.dataset.plot; document.querySelectorAll('[data-plot]').forEach(function(o){ press(o,o===b); }); }); });
+
+var mP=document.getElementById('mPassive'), mA=document.getElementById('mActive');
+function setMode(a){ P.active=a; press(mP,!a); press(mA,a); if(a) module_.visible=true; }
+mP.addEventListener('click',function(){setMode(false);});
+mA.addEventListener('click',function(){setMode(true);});
+
+var bT=document.getElementById('bThermal');
+bT.addEventListener('click',function(){ thermal=!thermal; press(bT,thermal); applyThermalMode(); });
+var bS=document.getElementById('bSection');
+bS.addEventListener('click',function(){ section=!section; press(bS,section);
+  renderer.clippingPlanes=section?[clipPlane]:[];
+  [matLaptop,matScreen].forEach(function(m){ m.transparent=section; m.opacity=section?.28:1;
+    m.depthWrite=!section; m.needsUpdate=true; });
+  applyThermalMode();
+  if(section){ goal.th=.62; goal.ph=1.18; goal.r=600; } });
+var bL=document.getElementById('bLabels');
+bL.addEventListener('click',function(){ showLabels=!showLabels; press(bL,showLabels); });
+
+function slider(id,vid,fmt,apply){
+  var s=document.getElementById(id), v=document.getElementById(vid);
+  function upd(){ v.textContent=fmt(+s.value); apply(+s.value); }
+  s.addEventListener('input',upd); upd();
+}
+slider('sAmb','vAmb',function(x){return x+' °C';},function(x){P.ambient=x;});
+slider('sLoad','vLoad',function(x){return x+' W';},function(x){P.load=x;});
+slider('sRear','vRear',function(x){return x+' mm';},function(x){P.rearH=x/1000; regeo();});
+slider('sCov','vCov',function(x){return x+' %';},function(x){P.coverage=x/100; regeo();});
+slider('sPitch','vPitch',function(x){return x+' mm';},function(x){P.pitch=x/1000; regeo();});
+slider('sFanPa','vFanPa',function(x){return x+' Pa';},function(x){P.fanPa=x;});
+slider('sFanQ','vFanQ',function(x){return x.toFixed(1)+' CFM';},function(x){P.fanCFM=x;});
+var built=false;
+function regeo(){ G=PHYS.geometry(P); if(built) buildStand(); }
+document.querySelectorAll('[data-desk]').forEach(function(b){ b.addEventListener('click',function(){
+  P.desk=b.dataset.desk;
+  document.querySelectorAll('[data-desk]').forEach(function(o){ press(o,o===b); }); }); });
+
+/* ---------- readouts ---------- */
+var R={}; ['dBig','dFlow','rdSkin','rsSkin','chipDesk','chipStand','dJuncS','dPowS','dVel','dFin','hud']
+  .forEach(function(k){ R[k]=document.getElementById(k); });
+function setChip(el,c){
+  var on=c.throttle<0.985;
+  el.className='thr'+(on?' on':'');
+  el.textContent=on?('throttling '+(c.throttle*100).toFixed(0)+'%'):'full speed';
+}
+function updateReadouts(){
+  var dT=cDesk.Tc-cStand.Tc, dJ=cDesk.Tj-cStand.Tj, dP=cStand.power-cDesk.power;
+  R.dBig.textContent=(dT<0?'+':'')+Math.abs(dT).toFixed(1)+' °C';
+  R.dBig.style.color=dT>=0?'var(--good)':'var(--bad)';
+  R.dFlow.innerHTML=cDesk.Tc.toFixed(1)+' °C <i>→</i> '+cStand.Tc.toFixed(1)+' °C';
+  R.rdSkin.innerHTML=cDesk.Tc.toFixed(1)+'<small> °C</small>';
+  R.rsSkin.innerHTML=cStand.Tc.toFixed(1)+'<small> °C</small>';
+  setChip(R.chipDesk,cDesk); setChip(R.chipStand,cStand);
+  R.dJuncS.innerHTML=(dJ<0?'+':'')+Math.abs(dJ).toFixed(0)+'<small> °C</small>';
+  R.dPowS.innerHTML=(dP>=0?'+':'−')+Math.abs(dP).toFixed(1)+'<small> W</small>';
+  R.dVel.innerHTML=(cStand.flowV*1000).toFixed(cStand.flowV<.05?1:0)+'<small> mm/s</small>';
+  R.dFin.innerHTML=(G.Awet*1e4).toFixed(0)+'<small> cm²</small>';
+  var t=cStand.t, mm=Math.floor(t/60), ss=Math.floor(t%60);
+  R.hud.innerHTML='<b>'+mm+':'+(ss<10?'0':'')+ss+'</b> elapsed<br>'+
+    (P.active?'active · fans on':'passive · buoyancy only')+'<br>'+speed+'× speed';
+}
+
+/* ---------- chart ---------- */
+var chartCv=document.getElementById('chartCv'), cx=chartCv.getContext('2d');
+var CC={};
+function chartColors(){
+  CC={desk:tok('--lineDesk')||'#C9651C', stand:tok('--lineStand')||'#0F6B88',
+      band:tok('--band')||'rgba(15,107,136,.13)', rule:tok('--rule')||'#D5DADD',
+      muted:tok('--muted')||'#69737A', ink:tok('--ink')||'#13181B',
+      bad:tok('--bad')||'#C0392B'};
+}
+function drawChart(){
+  var w=chartCv.clientWidth||600, h=212, dpr=Math.min(devicePixelRatio,2);
+  if(chartCv.width!==Math.round(w*dpr)||chartCv.height!==Math.round(h*dpr)){
+    chartCv.width=Math.round(w*dpr); chartCv.height=Math.round(h*dpr);
+  }
+  cx.setTransform(dpr,0,0,dpr,0,0); cx.clearRect(0,0,w,h);
+  var L=46,Rr=58,T=10,B=24, pw=w-L-Rr, ph=h-T-B;
+  var A=plot==='skin'?H.ds:H.dj, Bv=plot==='skin'?H.ss:H.sj;
+  var tMax=Math.max(20,Math.ceil((H.t.length?H.t[H.t.length-1]:0)/10)*10);
+  var lo=P.ambient, hi=P.ambient+15;
+  for(var i=0;i<A.length;i++){ lo=Math.min(lo,A[i],Bv[i]); hi=Math.max(hi,A[i],Bv[i]); }
+  if(plot==='junc') hi=Math.max(hi,PHYS.TJ_LIMIT+6);
+  lo=Math.floor(lo/5)*5; hi=Math.ceil((hi+2)/5)*5;
+  var X=function(m){ return L+pw*Math.min(m/tMax,1); };
+  var Y=function(v){ return T+ph*(1-(v-lo)/(hi-lo)); };
+
+  cx.font='10px "IBM Plex Mono", monospace'; cx.textBaseline='middle';
+  cx.strokeStyle=CC.rule; cx.fillStyle=CC.muted; cx.lineWidth=1;
+  var stepY=Math.max(5,Math.round((hi-lo)/5/5)*5);
+  for(var v=lo;v<=hi;v+=stepY){
+    var y=Math.round(Y(v))+.5;
+    cx.beginPath(); cx.moveTo(L,y); cx.lineTo(L+pw,y); cx.stroke();
+    cx.textAlign='right'; cx.fillText(v+'°',L-7,y);
+  }
+  cx.textAlign='center';
+  for(var m=0;m<=tMax;m+=tMax/4){
+    var x=Math.round(X(m))+.5;
+    cx.strokeStyle=CC.rule; cx.beginPath(); cx.moveTo(x,T); cx.lineTo(x,T+ph); cx.stroke();
+    cx.fillStyle=CC.muted; cx.fillText(m+(m===tMax?' min':''),x,T+ph+12);
+  }
+  if(plot==='junc'&&PHYS.TJ_LIMIT<=hi&&PHYS.TJ_LIMIT>=lo){
+    var yl=Math.round(Y(PHYS.TJ_LIMIT))+.5;
+    cx.save(); cx.setLineDash([4,4]); cx.strokeStyle=CC.bad;
+    cx.beginPath(); cx.moveTo(L,yl); cx.lineTo(L+pw,yl); cx.stroke(); cx.restore();
+    cx.fillStyle=CC.bad; cx.textAlign='left'; cx.fillText('throttle limit',L+5,yl-8);
+  }
+  if(A.length<2){
+    cx.fillStyle=CC.muted; cx.textAlign='center';
+    cx.fillText('press Run to start the simulation',L+pw/2,T+ph/2);
+    return;
+  }
+  /* shaded band = the saving */
+  cx.beginPath(); cx.moveTo(X(H.t[0]),Y(A[0]));
+  for(var i2=1;i2<A.length;i2++) cx.lineTo(X(H.t[i2]),Y(A[i2]));
+  for(var i3=Bv.length-1;i3>=0;i3--) cx.lineTo(X(H.t[i3]),Y(Bv[i3]));
+  cx.closePath(); cx.fillStyle=CC.band; cx.fill();
+
+  function line(arr,col){
+    cx.beginPath(); cx.moveTo(X(H.t[0]),Y(arr[0]));
+    for(var i=1;i<arr.length;i++) cx.lineTo(X(H.t[i]),Y(arr[i]));
+    cx.strokeStyle=col; cx.lineWidth=2; cx.lineJoin='round'; cx.stroke();
+  }
+  line(A,CC.desk); line(Bv,CC.stand);
+
+  var n=A.length-1, xe=X(H.t[n]);
+  [[A[n],CC.desk],[Bv[n],CC.stand]].forEach(function(p){
+    cx.beginPath(); cx.arc(xe,Y(p[0]),3.2,0,6.2832); cx.fillStyle=p[1]; cx.fill();
+    cx.textAlign='left'; cx.fillText(p[0].toFixed(1)+'°',xe+7,Y(p[0]));
+  });
+}
+
+/* ---------- theme ---------- */
+function applyTheme(){
+  scene.background=new THREE.Color(tok('--stage')||'#E6EAEC');
+  matGround.color.set(tok('--stage')||'#E6EAEC');
+  grid.material.color.set(tok('--grid')||'#C8CFD3');
+  airColors(); chartColors();
+  var dark=new THREE.Color(tok('--ground')).getHSL({}).l<.4;
+  hemi.intensity=dark?.55:.7; key.intensity=dark?.85:.9;
+  matLaptop.color.set(dark?0x9aa3a8:0xb9c0c4);
+}
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',applyTheme);
+
+/* ---------- init + loop ---------- */
+function resize(){ var w=stage.clientWidth,h=stage.clientHeight;
+  renderer.setSize(w,h,false); camera.aspect=w/h; camera.updateProjectionMatrix(); }
+new ResizeObserver(resize).observe(stage);
+built=true; buildStand(); applyTheme(); resize(); resetSim();
+
+var DT=0.1, acc=0, lastRead=0, last=performance.now();
+function frame(now){
+  var dtR=Math.min((now-last)/1000,.05); last=now;
+  if(running){
+    acc+=dtR*speed;
+    var n=Math.min(Math.floor(acc/DT),500); acc-=n*DT;
+    for(var i=0;i<n;i++){ PHYS.step(cDesk,P,G,DT); PHYS.step(cStand,P,G,DT); }
+    if(cStand.t-lastSample>=2){ lastSample=cStand.t; sample(); }
+  }
+  sph.r+=(goal.r-sph.r)*.11; sph.th+=(goal.th-sph.th)*.11; sph.ph+=(goal.ph-sph.ph)*.11;
+  curTgt.lerp(tgt,.14);
+  camera.position.set(curTgt.x+sph.r*Math.sin(sph.ph)*Math.sin(sph.th),
+                      curTgt.y+sph.r*Math.cos(sph.ph),
+                      curTgt.z+sph.r*Math.sin(sph.ph)*Math.cos(sph.th));
+  camera.lookAt(curTgt);
+  var want=P.active?1:0;
+  modAnim+=(want-modAnim)*(RM?1:.09);
+  module_.position.z=(RZ-MOD_D/2-96)+((RZ-MOD_D/2-1)-(RZ-MOD_D/2-96))*modAnim;
+  if(modAnim<.006&&!P.active) module_.visible=false;
+  spin+=dtR*(P.active?26:0)*(RM?.2:1);
+  for(var f=0;f<fans.length;f++) fans[f].rotation.z=spin*(f%2?1:-1);
+  led.visible=P.active&&modAnim>.7;
+  stepAir(dtR); repaint();
+  if(now-lastRead>110){ updateReadouts(); drawChart(); lastRead=now; }
+  updateLabels();
+  renderer.render(scene,camera);
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+})();
+
+</script>
