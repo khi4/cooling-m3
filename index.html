@@ -196,6 +196,18 @@ input[type=range]{width:100%; accent-color:var(--accent); margin:0; display:bloc
 .method{background:var(--panel-2); margin-top:0; padding-left:18px !important; padding-right:18px !important}
 @media(max-width:640px){ .doc h2{max-width:none} }
 
+
+.doc .cap2{font-size:12px; color:var(--muted); line-height:1.5; margin:9px 0 0; max-width:82ch}
+.doc .tiles{margin-bottom:0}
+.two.tight{gap:10px 34px}
+.mini{min-width:0 !important}
+.mini td{font-size:13px; padding:7px 10px 7px 0}
+.doc td.m{color:var(--muted); font-weight:400}
+.warnbox{background:var(--panel); border:1px solid var(--rule); border-left:3px solid var(--bad);
+  padding:13px 16px; font-size:13px; line-height:1.58; color:var(--ink-2); margin:0 0 18px; max-width:86ch}
+.warnbox b{color:var(--bad)}
+.doc .risks{margin-top:0}
+
 @media(max-width:900px){
   .app{grid-template-columns:1fr}
   .rail{position:static; order:2}
@@ -328,139 +340,187 @@ input[type=range]{width:100%; accent-color:var(--accent); margin:0; display:bloc
 <div class="doc">
 
 <section>
-  <p class="eyebrow">§1 — By the numbers</p>
-  <h2>What the model says this is worth</h2>
-  <p class="prose">Everything below comes from one consistent run: 30&nbsp;°C room, 45 minutes of sustained load, default geometry. Change any input in the simulator above and these move with it.</p>
-
+  <p class="eyebrow">§1 — The numbers</p>
+  <h2>What it buys you</h2>
   <div class="tiles">
-    <div class="tile"><div class="k">Passive · case cooler by</div><div class="v">8.7<span> °C</span></div>
-      <div class="n">stand alone, wooden desk, 16 W</div></div>
-    <div class="tile hi"><div class="k">Active · case cooler by</div><div class="v">16.7<span> °C</span></div>
-      <div class="n">fan module docked, same conditions</div></div>
-    <div class="tile hi"><div class="k">Sustained work gained</div><div class="v">+38<span> %</span></div>
-      <div class="n">24 W demanded, both pinned at the chip limit</div></div>
-    <div class="tile"><div class="k">Heat-exchange area</div><div class="v">4,627<span> cm²</span></div>
-      <div class="n">80 channels inside a 30 mm-tall part</div></div>
-    <div class="tile"><div class="k">Front lift</div><div class="v">0<span> mm</span></div>
-      <div class="n">typing angle changes by 7.9° at the hinge only</div></div>
-    <div class="tile"><div class="k">Aluminium mass</div><div class="v">393<span> g</span></div>
-      <div class="n">skins plus corrugated core, 6061</div></div>
+    <div class="tile"><div class="k">Passive · cooler</div><div class="v">8.7<span> °C</span></div></div>
+    <div class="tile hi"><div class="k">Active · cooler</div><div class="v">16.7<span> °C</span></div></div>
+    <div class="tile"><div class="k">Passive · more work</div><div class="v">+18<span> %</span></div></div>
+    <div class="tile hi"><div class="k">Active · more work</div><div class="v">+38<span> %</span></div></div>
+    <div class="tile"><div class="k">Fin area</div><div class="v">4,627<span> cm²</span></div></div>
+    <div class="tile"><div class="k">Front lift</div><div class="v">0<span> mm</span></div></div>
   </div>
+  <p class="cap2">30 °C room · 45 min sustained · wooden desk · 16 W (temperature) and 24 W (work)</p>
 
-  <h3>The desk underneath changes the answer</h3>
-  <p class="prose">This is the least intuitive result in the whole study. Passively, the stand is mostly a <em>conduction bridge</em> — so how well it works depends on what it can conduct into.</p>
-  <div class="scroll">
-  <table>
-    <thead><tr><th>Desk surface</th><th class="n">Flat on desk</th><th class="n">On the stand</th><th class="n">Saved</th><th class="n">With fans</th><th class="n">Saved</th></tr></thead>
+  <h3>Desk surface changes everything</h3>
+  <div class="scroll"><table>
+    <thead><tr><th>Desk</th><th class="n">Bare</th><th class="n">Stand</th><th class="n">Saved</th><th class="n">+ Fans</th><th class="n">Saved</th></tr></thead>
     <tbody>
-      <tr><td>Wood</td><td class="n">53.2 °C</td><td class="n">44.5 °C</td><td class="n g">8.7 K</td><td class="n">36.6 °C</td><td class="n g">16.7 K</td></tr>
-      <tr><td>Laminate</td><td class="n">52.1 °C</td><td class="n">43.8 °C</td><td class="n g">8.4 K</td><td class="n">36.4 °C</td><td class="n g">15.7 K</td></tr>
-      <tr><td>Glass</td><td class="n">48.9 °C</td><td class="n">40.8 °C</td><td class="n g">8.1 K</td><td class="n">35.7 °C</td><td class="n g">13.2 K</td></tr>
-      <tr class="hl"><td>Steel</td><td class="n">48.5 °C</td><td class="n">34.3 °C</td><td class="n g">14.2 K</td><td class="n">33.3 °C</td><td class="n g">15.3 K</td></tr>
-    </tbody>
-  </table>
-  </div>
-  <p class="prose small">On steel the passive stand nearly matches the active one — the desk itself becomes the heat sink. On wood it has nowhere to dump, and the fan module has to do the work.</p>
+      <tr><td>Wood</td><td class="n">53.2</td><td class="n">44.5</td><td class="n g">8.7 K</td><td class="n">36.6</td><td class="n g">16.7 K</td></tr>
+      <tr><td>Laminate</td><td class="n">52.1</td><td class="n">43.8</td><td class="n g">8.4 K</td><td class="n">36.4</td><td class="n g">15.7 K</td></tr>
+      <tr><td>Glass</td><td class="n">48.9</td><td class="n">40.8</td><td class="n g">8.1 K</td><td class="n">35.7</td><td class="n g">13.2 K</td></tr>
+      <tr class="hl"><td>Steel</td><td class="n">48.5</td><td class="n">34.3</td><td class="n g">14.2 K</td><td class="n">33.3</td><td class="n g">15.3 K</td></tr>
+    </tbody></table></div>
+  <p class="cap2">Passively the stand is a conduction bridge, so it works best on a desk that can absorb heat. On steel it nearly matches the fan module.</p>
 
-  <h3>Build specification, as modelled</h3>
+  <h3>Build spec</h3>
   <div class="specs">
-    <dl><dt>Rear height</dt><dd>30 mm</dd><dt>Front intake face</dt><dd>13.5 mm</dd>
-        <dt>Stand depth</dt><dd>118 mm</dd><dt>Body coverage</dt><dd>55 %</dd>
-        <dt>Laptop tilt</dt><dd>7.9°</dd></dl>
-    <dl><dt>Corrugation pitch</dt><dd>14 mm</dd><dt>Channel count</dt><dd>80</dd>
-        <dt>Hydraulic diameter</dt><dd>5.7 mm</dd><dt>Open flow area</dt><dd>55.3 cm²</dd>
-        <dt>Skin / fin gauge</dt><dd>1.0 / 0.4 mm</dd></dl>
-    <dl><dt>Module envelope</dt><dd>200 × 36 × 30</dd><dt>Fan spec modelled</dt><dd>45 Pa · 3 CFM</dd>
-        <dt>Air speed, passive</dt><dd>2.3 mm/s</dd><dt>Air speed, active</dt><dd>254 mm/s</dd>
-        <dt>Attachment</dt><dd>magnetic, 2 pucks</dd></dl>
+    <dl><dt>Rear height</dt><dd>30 mm</dd><dt>Front intake</dt><dd>13.5 mm</dd>
+        <dt>Depth</dt><dd>118 mm</dd><dt>Coverage</dt><dd>55 %</dd><dt>Tilt</dt><dd>7.9°</dd></dl>
+    <dl><dt>Pitch</dt><dd>14 mm</dd><dt>Channels</dt><dd>80</dd>
+        <dt>Hydraulic dia.</dt><dd>5.7 mm</dd><dt>Skin / fin</dt><dd>1.0 / 0.4 mm</dd><dt>Mass</dt><dd>393 g</dd></dl>
+    <dl><dt>Module</dt><dd>200×36×30</dd><dt>Fan</dt><dd>45 Pa · 3 CFM</dd>
+        <dt>Air, passive</dt><dd>2.3 mm/s</dd><dt>Air, active</dt><dd>254 mm/s</dd><dt>Mount</dt><dd>magnetic</dd></dl>
   </div>
 </section>
 
 <section>
-  <p class="eyebrow">§2 — Product value</p>
-  <h2>The fan module is not an accessory. It is the product.</h2>
+  <p class="eyebrow">§2 — Target</p>
+  <h2>Why the MacBook Air, and almost nothing else</h2>
+  <p class="prose">Every Apple Silicon MacBook Air is <b>fanless</b>. Its entire thermal budget is the metal shell. That is the only reason this product has a job — and it is why a MacBook Pro is a bad target: fans already move the heat, so improving the shell barely registers.</p>
 
-  <div class="two">
+  <h3>What a bare Air gives up — 24 W demanded, wooden desk</h3>
+  <div class="scroll"><table>
+    <thead><tr><th>Room</th><th class="n">Bare</th><th class="n">+ Stand</th><th class="n">+ Fans</th><th class="n">Passive gain</th><th class="n">Active gain</th></tr></thead>
+    <tbody>
+      <tr><td>18 °C</td><td class="n">16.5 W · 69%</td><td class="n">19.3 W · 80%</td><td class="n">22.6 W · 94%</td><td class="n g">+17%</td><td class="n g">+37%</td></tr>
+      <tr><td>22 °C</td><td class="n">15.5 W · 64%</td><td class="n">18.5 W · 77%</td><td class="n">21.5 W · 89%</td><td class="n g">+19%</td><td class="n g">+39%</td></tr>
+      <tr><td>26 °C</td><td class="n">14.8 W · 61%</td><td class="n">17.4 W · 73%</td><td class="n">20.5 W · 86%</td><td class="n g">+18%</td><td class="n g">+39%</td></tr>
+      <tr class="hl"><td>30 °C</td><td class="n">14.1 W · 59%</td><td class="n">16.6 W · 69%</td><td class="n">19.3 W · 81%</td><td class="n g">+18%</td><td class="n g">+38%</td></tr>
+      <tr><td>34 °C</td><td class="n">13.2 W · 55%</td><td class="n">15.6 W · 65%</td><td class="n">18.3 W · 76%</td><td class="n g">+18%</td><td class="n g">+38%</td></tr>
+      <tr><td>38 °C</td><td class="n">12.4 W · 52%</td><td class="n">14.7 W · 61%</td><td class="n">17.2 W · 72%</td><td class="n g">+18%</td><td class="n g">+39%</td></tr>
+    </tbody></table></div>
+  <p class="cap2"><b>The strongest single result in the study:</b> the gain is flat at +18% / +38% across every room temperature. The product does not have a narrow operating window — it works the same in a cold office and a hot one.</p>
+
+  <div class="two tight">
     <div>
-      <h3>The problem being solved</h3>
-      <p>The MacBook Air M3 has no fan. Under sustained load it does not fail — it quietly slows down, holding its chip at about 100&nbsp;°C by doing less work. In a 30&nbsp;°C room it gives up roughly 40% of its demanded power.</p>
-      <p>So this is not a comfort accessory. <b>It is a performance accessory.</b> The temperature drop is the mechanism; the sustained watts are the benefit. That distinction should drive how the product is positioned, priced, and demonstrated.</p>
-
-      <h3>Who it is for</h3>
-      <p>People doing long, heavy, repeated work on a fanless machine: compiling, rendering, exporting video, running local models, long calls in a warm room. Anyone whose machine is fast for thirty seconds and ordinary after ten minutes.</p>
+      <h3>Priority order</h3>
+      <table class="mini"><tbody>
+        <tr><td>MacBook Air 13″ M2 / M3 / M4</td><td class="n g">best fit</td></tr>
+        <tr><td>MacBook Air 15″</td><td class="n">good — more shell, runs cooler</td></tr>
+        <tr><td>iPad Pro + Magic Keyboard</td><td class="n">fanless, unproven fit</td></tr>
+        <tr><td>MacBook Pro (any)</td><td class="n m">poor — already has fans</td></tr>
+      </tbody></table>
+      <p class="cap2">The 13″ is the hottest case and the highest volume. Start there; a 15″ variant is a footprint change, not a redesign.</p>
     </div>
     <div>
-      <h3>The honest finding</h3>
-      <p>Passively, the corrugation is not working as a duct. Solved channel velocity is about <b>2 mm/s</b>, carrying well under a watt. Almost all of the passive 8.7&nbsp;K comes from metal touching the laptop and conducting heat away — not from moving air.</p>
-      <p>A plain finned plate would get most of that. The corrugated core only earns its complexity once air is being forced through it, where those 4,627&nbsp;cm² become genuinely excellent.</p>
-      <p><b>Conclusion:</b> lead with the active product. Passive is the silent fallback, not the headline.</p>
-
-      <h3>What is actually differentiated</h3>
-      <p><b>Rear-only, zero front lift.</b> Most stands tilt the whole machine. This one leaves the front edge down and the wrists where they were.</p>
-      <p><b>Contact, not clearance.</b> Competitors lift the laptop into air. This conducts into metal — a fundamentally wider path.</p>
-      <p><b>One core, two modes.</b> The same part is a passive spreader and a forced-convection heat exchanger.</p>
+      <h3>Does it matter when idle?</h3>
+      <table class="mini"><tbody>
+        <tr><td>Light load, 8 W — bare</td><td class="n">42.2 °C</td></tr>
+        <tr><td>Light load, 8 W — stand</td><td class="n g">37.6 °C</td></tr>
+        <tr><td>Light load, 8 W — fans</td><td class="n g">33.3 °C</td></tr>
+      </tbody></table>
+      <p class="cap2">Yes — 4.6 K even at light load, which is the difference between a warm palm rest and a comfortable one. But the sustained-work numbers above are the real sales argument.</p>
     </div>
-  </div>
-
-  <div class="risks">
-    <h3>What could still sink it</h3>
-    <ol>
-      <li><b>Contact quality is everything.</b> If the laptop does not sit flat and tight on the top skin, most of the passive benefit disappears. Flatness tolerance and a compliant thermal pad are the highest-risk details in the design — higher than channel shape by a wide margin.</li>
-      <li><b>Weight.</b> 393 g of aluminium against a 1.24 kg laptop. “Slim and portable” gets strained; be honest in the positioning rather than discovering it in reviews.</li>
-      <li><b>Never modelled:</b> fan noise, battery runtime, and whether magnets strong enough to dock reliably are also strong enough to worry people near a laptop. Any of these could kill the product independently of thermals.</li>
-      <li><b>Desk dependence.</b> Weakest on soft, insulating surfaces — sofas, beds, wooden desks — which is where laptops often actually sit.</li>
-    </ol>
   </div>
 </section>
 
 <section>
-  <p class="eyebrow">§3 — Vision</p>
-  <h2>Where this goes next</h2>
-  <p class="prose">Ordered so the cheapest test of the riskiest assumption comes first. Do not tool a corrugated core until the two mechanisms that carry the heat have been measured.</p>
+  <p class="eyebrow">§3 — Market</p>
+  <h2>How big could this be</h2>
+  <div class="warnbox">
+    <b>Read this first.</b> Every figure below is an order-of-magnitude estimate from general knowledge, not researched market data, and some of it may be out of date. The <em>structure</em> of the funnel is the useful part. Replace each number with a sourced one before making any decision that costs money.
+  </div>
 
+  <div class="scroll"><table>
+    <thead><tr><th>Funnel step</th><th class="n">Assumption</th><th class="n">Result</th></tr></thead>
+    <tbody>
+      <tr><td>Active Macs worldwide</td><td class="n m">est.</td><td class="n">~100 M</td></tr>
+      <tr><td>… that are notebooks</td><td class="n m">~80 %</td><td class="n">~80 M</td></tr>
+      <tr><td>… that are MacBook Air</td><td class="n m">~55 %</td><td class="n">~44 M</td></tr>
+      <tr><td>… Apple Silicon, therefore fanless</td><td class="n m">~65 %</td><td class="n">~29 M</td></tr>
+      <tr class="hl"><td>… doing sustained heavy work</td><td class="n m">~12 %</td><td class="n">~3.4 M</td></tr>
+      <tr><td>… aware of throttling &amp; would pay</td><td class="n m">~8 %</td><td class="n">~275 K</td></tr>
+      <tr><td>Year-1 reachable via niche channel</td><td class="n m">5–15 %</td><td class="n g">14 K – 41 K units</td></tr>
+    </tbody></table></div>
+
+  <div class="two tight">
+    <div>
+      <h3>Revenue scale, year 1</h3>
+      <table class="mini"><tbody>
+        <tr><td>Retail price assumed</td><td class="n">$89</td></tr>
+        <tr><td>Gross margin assumed</td><td class="n">45 %</td></tr>
+        <tr><td>Conservative — 14 K units</td><td class="n">$1.2 M rev · $0.55 M GP</td></tr>
+        <tr class="hl"><td>Optimistic — 41 K units</td><td class="n">$3.7 M rev · $1.65 M GP</td></tr>
+        <tr><td>Pool growth per year</td><td class="n">~9 M new Airs</td></tr>
+      </tbody></table>
+    </div>
+    <div>
+      <h3>What that means</h3>
+      <p>This is a <b>real niche hardware business, not a unicorn</b>. Crowdfunded-accessory scale: single-digit millions in year one, a growing installed base, and a defensible technical story.</p>
+      <p>The addressable pool grows by roughly 9 M fanless Airs a year, and Apple shows no sign of putting a fan in the Air. The thermal problem is structural, not a bug that gets patched.</p>
+    </div>
+  </div>
+
+  <h3>Pricing sanity</h3>
+  <div class="scroll"><table>
+    <thead><tr><th>Comparable</th><th class="n">Typical price</th><th class="n">What it does</th></tr></thead>
+    <tbody>
+      <tr><td>Plastic laptop riser</td><td class="n">$20 – 35</td><td class="n m">lifts, no thermal claim</td></tr>
+      <tr><td>Aluminium stand</td><td class="n">$40 – 70</td><td class="n m">lifts, some spreading</td></tr>
+      <tr><td>USB fan cooling pad</td><td class="n">$30 – 60</td><td class="n m">loud, tethered, generic</td></tr>
+      <tr class="hl"><td>This product</td><td class="n g">$79 – 99</td><td class="n">measured watts, cordless, modular</td></tr>
+    </tbody></table></div>
+  <p class="cap2">The premium has to be earned by a published, repeatable benchmark — “holds 19 W instead of 14 W” — not by the word aluminium.</p>
+</section>
+
+<section>
+  <p class="eyebrow">§4 — Value &amp; risk</p>
+  <h2>The honest read</h2>
+  <div class="two tight">
+    <div>
+      <h3>The finding that should shape the product</h3>
+      <p>Passively, channel velocity is <b>2.3 mm/s</b> — under a watt of airflow. Almost all of the 8.7 K comes from metal touching the laptop and conducting heat away, not from moving air.</p>
+      <p>The corrugation only earns its complexity under forced air. <b>Lead with the active product; passive is the silent fallback.</b></p>
+      <h3>What is differentiated</h3>
+      <p><b>Zero front lift</b> — wrists stay put. <b>Contact, not clearance</b> — conducts into metal instead of lifting into air. <b>One core, two modes.</b></p>
+    </div>
+    <div class="risks">
+      <h3>What could sink it</h3>
+      <ol>
+        <li><b>Contact quality.</b> If the laptop doesn't sit flat and tight, most of the passive benefit disappears. Highest-risk detail in the design.</li>
+        <li><b>393 g</b> against a 1.24 kg laptop. “Portable” is a stretch — say so before reviewers do.</li>
+        <li><b>Never modelled:</b> fan noise, battery runtime, magnet safety. Any could kill it independently of thermals.</li>
+        <li><b>Soft desks.</b> Weakest on sofas and beds, where laptops often actually sit.</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<section>
+  <p class="eyebrow">§5 — Roadmap</p>
+  <h2>Cheapest test of the riskiest assumption, first</h2>
   <div class="phases">
-    <div class="ph">
-      <div class="pn">Phase 1</div>
-      <h3>Prove the mechanisms, not the shape</h3>
-      <p>Build the rear fan module and bolt it to a <em>plain flat aluminium plate</em>. No corrugation, no tooling. This isolates the only two things the model says matter: contact conduction and forced airflow.</p>
-      <p class="m">Cost: a few hundred. Time: a weekend. Answers: most of the risk.</p>
-    </div>
-    <div class="ph">
-      <div class="pn">Phase 2</div>
-      <h3>Measure, then commit to the core</h3>
-      <p>Repeatable sustained load, thermocouples on the bottom case at three points, chip temperature and package power logged together. Test on wood and on steel. Only if active mode validates does the corrugated core justify its tooling.</p>
-      <p class="m">A cooler machine holds a higher clock, so watch power as well as temperature — an experiment that gets faster instead of cooler is still a win.</p>
-    </div>
-    <div class="ph">
-      <div class="pn">Phase 3</div>
-      <h3>Make it a product</h3>
-      <p>Battery runtime and charging, fan curve and acoustic target, magnet strength and safety, industrial design, and the contact pad that makes or breaks the passive mode. Then variants — other machines, other footprints.</p>
-      <p class="m">The hard engineering here is mechanical and acoustic, not thermal. The thermal question will already be settled.</p>
-    </div>
+    <div class="ph"><div class="pn">Phase 1 · a weekend</div><h3>Prove the mechanism</h3>
+      <p>Rear fan module bolted to a <em>plain flat aluminium plate</em>. No corrugation, no tooling. Isolates the only two things that carry heat: contact conduction and forced airflow.</p>
+      <p class="m">Cost: a few hundred. Removes most of the risk.</p></div>
+    <div class="ph"><div class="pn">Phase 2 · a month</div><h3>Measure, then commit</h3>
+      <p>Repeatable load, thermocouples at three points on the bottom case, chip temperature and package power logged together. Wood and steel. Tool the corrugated core only if active mode validates.</p>
+      <p class="m">Watch watts, not just degrees — a cooler machine gets faster, which reads as a null result if you only watch temperature.</p></div>
+    <div class="ph"><div class="pn">Phase 3 · product</div><h3>Make it real</h3>
+      <p>Battery runtime, acoustic target, magnet strength and safety, the contact pad, industrial design. Then the 15″ variant.</p>
+      <p class="m">The hard engineering here is mechanical and acoustic. The thermal question is already answered.</p></div>
   </div>
-
   <h3>Open questions the model cannot answer</h3>
   <ul class="oq">
-    <li>What contact conductance is actually achievable with an unclamped laptop resting under its own weight?</li>
-    <li>Is pull or push better in practice once real ducting losses and leakage are present?</li>
-    <li>How loud is 3 CFM through 80 narrow channels — and is that acceptable beside a silent machine?</li>
-    <li>Does the rear riser foul the display at wide opening angles on a real chassis?</li>
-    <li>Will anyone carry 393 g to get 17 °C, or does the market want the passive-only version at half the weight?</li>
+    <li>What contact conductance is achievable with an unclamped laptop resting under its own weight?</li>
+    <li>How loud is 3 CFM through 80 narrow channels, beside a silent machine?</li>
+    <li>Does the rear riser foul the display at wide opening angles?</li>
+    <li>Will people carry 393 g for 17 °C — or does the market want a passive-only version at half the weight?</li>
   </ul>
 </section>
 
 <section class="method">
-  <p class="eyebrow">§4 — Method &amp; limits</p>
-  <h2>How to read any of this</h2>
-  <div class="two">
+  <p class="eyebrow">§6 — Method &amp; limits</p>
+  <div class="two tight">
     <div>
-      <p><b>Reading the chart.</b> The shaded band between the two curves is the product. It widens as the run proceeds, because the bare machine keeps soaking heat into a desk that cannot absorb it fast enough. Where a curve flattens at 100&nbsp;°C on the chip view, that machine has started throttling — holding temperature by doing less work, which the “work sustained” figure reports.</p>
-      <p><b>What is solved.</b> Two transient cases step together. Solids are lumped RC nodes — chip, chassis, and twenty slices of the stand along the flow path. Air is marched slice by slice with an effectiveness-NTU step. Channel flow comes from a pressure balance: buoyancy against viscous loss when passive, fan curve against system curve when active. Radiation uses parallel-plate view factors. The desk is a semi-infinite solid under transient flux, which is why temperatures keep creeping for an hour and why steel behaves nothing like oak.</p>
+      <p><b>Reading the chart.</b> The shaded band between the curves is the product. A curve flattening at 100 °C on the chip view means that machine has started throttling — holding temperature by doing less work.</p>
+      <p><b>What is solved.</b> Two transient cases step together. Solids are RC nodes — chip, chassis, 20 slices of the stand. Air is marched slice by slice. Flow comes from a pressure balance: buoyancy vs viscous loss when passive, fan curve vs system curve when active. The desk is a semi-infinite solid under transient flux.</p>
     </div>
     <div>
-      <p><b>The one fitted constant.</b> Physics correlations alone drift, so the model is anchored to a known observable: a bare machine on a wooden desk reaching 46&nbsp;°C case and 95&nbsp;°C chip after 45 minutes at 16&nbsp;W and 22&nbsp;°C ambient. One constant was adjusted until it reproduced that; everything else was left alone.</p>
-      <p><b>What it cannot do.</b> Not CFD. It resolves temperature <em>along</em> the channel, not across the machine — no hot spots, no recirculation, no flow separation. Individual conductances are good to roughly ±30–40%. The comparisons are the trustworthy part, because they come from the same equations applied consistently. The absolute numbers inherit the anchor and the assumptions.</p>
-      <p><b>Status.</b> Nothing here has been built or measured. Treat every figure as a hypothesis with a number attached, good enough to choose between designs and not good enough for a spec sheet.</p>
+      <p><b>Anchor.</b> One constant is fitted so a bare machine on wood reaches 46 °C case / 95 °C chip after 45 min at 16 W and 22 °C — what these machines measure at.</p>
+      <p><b>Limits.</b> Not CFD. Temperature along the channel, not across the machine — no hot spots, no recirculation. Conductances ±30–40%. The comparisons are trustworthy; the absolute numbers inherit the anchor.</p>
+      <p><b>Status.</b> Nothing here has been built or measured. Every figure is a hypothesis with a number attached.</p>
     </div>
   </div>
 </section>
