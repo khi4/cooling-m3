@@ -208,6 +208,14 @@ input[type=range]{width:100%; accent-color:var(--accent); margin:0; display:bloc
 .warnbox b{color:var(--bad)}
 .doc .risks{margin-top:0}
 
+
+.comp td{vertical-align:top; font-size:13px; line-height:1.55}
+.comp td.s{font-family:"IBM Plex Mono",monospace; font-size:11.5px; color:var(--muted); white-space:nowrap}
+.comp td:last-child{padding-right:0}
+.comp tr.warn td{background:var(--good-soft)}
+.comp tr.warn td b{color:var(--bad)}
+.doc .m2{border-top:1px solid var(--rule); padding-top:10px; margin-top:12px; font-size:12.5px}
+
 @media(max-width:900px){
   .app{grid-template-columns:1fr}
   .rail{position:static; order:2}
@@ -375,7 +383,50 @@ input[type=range]{width:100%; accent-color:var(--accent); margin:0; display:bloc
 </section>
 
 <section>
-  <p class="eyebrow">§2 — Target</p>
+  <p class="eyebrow">§2 — Components</p>
+  <h2>What the stand is made of, and why</h2>
+  <p class="prose">Nine parts, stand only — the fan module is separate. Three of them are sheet metal brazed into one stack, the way a car radiator core is built.</p>
+
+  <div class="scroll"><table class="comp">
+    <thead><tr><th>Part</th><th>Spec</th><th class="n">Mass</th><th>Why it exists</th></tr></thead>
+    <tbody>
+      <tr><td><b>Top skin</b></td><td class="s">1.0 mm 6061, black anodised</td><td class="n">89 g</td>
+        <td>The only surface touching the laptop. Carries most of the heat by conduction, then spreads it sideways into the folds. Thinning this saves weight but costs performance faster than any other part.</td></tr>
+      <tr class="hl"><td><b>Corrugated core</b></td><td class="s">0.4 mm 3003, 14 mm pitch, 80 channels</td><td class="n">215 g</td>
+        <td>One part doing two jobs: 4,627 cm² of fin area, and the walls of the air channels. The zigzag <em>is</em> the heat exchanger — this is what makes the fan module worth attaching.</td></tr>
+      <tr><td><b>Bottom skin</b></td><td class="s">1.0 mm 6061</td><td class="n">89 g</td>
+        <td>Closes the channels — without it the folds are open grooves, not ducts. Also presses flat against the desk, which is the main passive escape route for heat.</td></tr>
+      <tr><td><b>Side rails ×2</b></td><td class="s">aluminium extrusion</td><td class="n">35 g</td>
+        <td>Carry the laptop's weight so the thin core cannot crush, and set the wedge angle. Deliberately do not close the sides — air enters there as well as at the front.</td></tr>
+      <tr><td><b>Rear dock plate</b></td><td class="s">30 mm aluminium</td><td class="n">20 g</td>
+        <td>The flat tall face the module mates against. Aligns the fan outlets with the channel openings and gives the magnets something rigid to pull on.</td></tr>
+      <tr><td><b>Magnets ×2</b></td><td class="s">N42 neodymium, Ø14 mm</td><td class="n">12 g</td>
+        <td>Tool-free docking that self-aligns. Their pull force also sets how well the module seals to the channels — too weak and air leaks around the joint instead of going through it.</td></tr>
+      <tr class="warn"><td><b>Thermal pad</b></td><td class="s">silicone, ≥2 W/mK, 0.5–1 mm</td><td class="n">9 g</td>
+        <td><b>The highest-risk part in the whole design.</b> Fills the microscopic gaps between two nominally flat metal surfaces. Without it, an unclamped laptop resting under its own weight loses most of the contact benefit — and contact is where the passive cooling comes from.</td></tr>
+      <tr><td><b>Non-slip feet</b></td><td class="s">silicone, 4 off</td><td class="n">4 g</td>
+        <td>Stops the stand walking across the desk while you type. A stand that slides is a stand that loses contact.</td></tr>
+      <tr><td><b>Edge trim</b></td><td class="s">soft TPU, front lip</td><td class="n">2 g</td>
+        <td>The front lip sits directly against the chassis. Bare anodised aluminium would mark it within a week.</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="two tight">
+    <div>
+      <h3>Assembly</h3>
+      <p>Top skin, core and bottom skin are brazed as a single stack — CAB brazing, 3003 core between clad 6061 skins, exactly the radiator-core process. Rails and dock plate bond or rivet on afterwards, then the whole assembly is black anodised.</p>
+      <p>Brazing matters thermally, not just structurally: a glued joint would add a thermal resistance right where the heat has to cross.</p>
+    </div>
+    <div>
+      <h3>Why black anodise</h3>
+      <p>Bare aluminium has an emissivity around <b>0.05</b>; black anodising takes it to <b>0.88</b>. That is a seventeen-fold change in the radiation path — meaningful at these temperatures, and it costs almost nothing.</p>
+      <p class="m2">Total: <b>~475 g</b>. Dropping to 0.6 mm skins and a 0.3 mm core would reach ~350 g, at the cost of spreading performance in the top skin.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <p class="eyebrow">§3 — Target</p>
   <h2>Why the MacBook Air, and almost nothing else</h2>
   <p class="prose">Every Apple Silicon MacBook Air is <b>fanless</b>. Its entire thermal budget is the metal shell. That is the only reason this product has a job — and it is why a MacBook Pro is a bad target: fans already move the heat, so improving the shell barely registers.</p>
 
@@ -416,7 +467,7 @@ input[type=range]{width:100%; accent-color:var(--accent); margin:0; display:bloc
 </section>
 
 <section>
-  <p class="eyebrow">§3 — Market</p>
+  <p class="eyebrow">§4 — Market</p>
   <h2>How big could this be</h2>
   <div class="warnbox">
     <b>Read this first.</b> Every figure below is an order-of-magnitude estimate from general knowledge, not researched market data, and some of it may be out of date. The <em>structure</em> of the funnel is the useful part. Replace each number with a sourced one before making any decision that costs money.
@@ -465,7 +516,7 @@ input[type=range]{width:100%; accent-color:var(--accent); margin:0; display:bloc
 </section>
 
 <section>
-  <p class="eyebrow">§4 — Value &amp; risk</p>
+  <p class="eyebrow">§5 — Value &amp; risk</p>
   <h2>The honest read</h2>
   <div class="two tight">
     <div>
@@ -488,7 +539,7 @@ input[type=range]{width:100%; accent-color:var(--accent); margin:0; display:bloc
 </section>
 
 <section>
-  <p class="eyebrow">§5 — Roadmap</p>
+  <p class="eyebrow">§6 — Roadmap</p>
   <h2>Cheapest test of the riskiest assumption, first</h2>
   <div class="phases">
     <div class="ph"><div class="pn">Phase 1 · a weekend</div><h3>Prove the mechanism</h3>
@@ -511,7 +562,7 @@ input[type=range]{width:100%; accent-color:var(--accent); margin:0; display:bloc
 </section>
 
 <section class="method">
-  <p class="eyebrow">§6 — Method &amp; limits</p>
+  <p class="eyebrow">§7 — Method &amp; limits</p>
   <div class="two tight">
     <div>
       <p><b>Reading the chart.</b> The shaded band between the curves is the product. A curve flattening at 100 °C on the chip view means that machine has started throttling — holding temperature by doing less work.</p>
