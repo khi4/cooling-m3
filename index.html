@@ -229,6 +229,19 @@ input[type=range]{width:100%; accent-color:var(--accent); margin:0; display:bloc
 .plink b{color:inherit}
 .plink[aria-pressed="true"]{color:var(--good)}
 
+
+.expwrap{margin:18px 0 22px}
+.expstage{position:relative; background:var(--stage); border:1px solid var(--rule); border-radius:4px;
+  overflow:hidden; height:clamp(360px,52vh,540px)}
+.expstage canvas{display:block; width:100%; height:100%; touch-action:none; cursor:grab}
+.expstage canvas:active{cursor:grabbing}
+#expLabels{position:absolute; inset:0; pointer-events:none}
+.elab{position:absolute; transform:translate(-50%,-50%); font-family:"IBM Plex Mono",monospace;
+  font-size:11px; white-space:nowrap; padding:3px 8px; border-radius:2px; background:var(--panel);
+  color:var(--ink); border:1px solid var(--rule-2); transition:opacity .2s; opacity:0}
+.exphint{position:absolute; left:12px; bottom:10px; font-family:"IBM Plex Mono",monospace;
+  font-size:10px; color:var(--muted); pointer-events:none}
+
 @media(max-width:900px){
   .app{grid-template-columns:1fr}
   .rail{position:static; order:2}
@@ -414,6 +427,14 @@ input[type=range]{width:100%; accent-color:var(--accent); margin:0; display:bloc
   <p class="eyebrow">§2 — Components</p>
   <h2>What the stand is made of, and why</h2>
   <p class="prose">Nine parts, stand only — the fan module is separate. Three of them are sheet metal brazed into one stack, the way a car radiator core is built.</p>
+
+  <div class="expwrap">
+    <div class="expstage" id="expStage">
+      <canvas id="expCv"></canvas>
+      <div id="expLabels"></div>
+      <div class="exphint">drag to orbit · all nine parts, separated along the axis each one assembles on</div>
+    </div>
+  </div>
 
   <div class="scroll"><table class="comp">
     <thead><tr><th>Part</th><th>Spec</th><th class="n">Mass</th><th>Why it exists</th></tr></thead>
@@ -1284,7 +1305,8 @@ document.querySelectorAll('[data-part]').forEach(function(b){
   });
 });
 var built=false;
-function regeo(){ G=PHYS.geometry(P); if(built) buildStand(); }
+function regeo(){ G=PHYS.geometry(P); if(built){ buildStand();
+  if(window.__rebuildExploded) window.__rebuildExploded(); } }
 document.querySelectorAll('[data-desk]').forEach(function(b){ b.addEventListener('click',function(){
   P.desk=b.dataset.desk;
   document.querySelectorAll('[data-desk]').forEach(function(o){ press(o,o===b); }); }); });
@@ -1401,6 +1423,172 @@ function resize(){ var w=stage.clientWidth,h=stage.clientHeight;
   renderer.setSize(w,h,false); camera.aspect=w/h; camera.updateProjectionMatrix(); }
 new ResizeObserver(resize).observe(stage);
 built=true; buildStand(); applyTheme(); resize(); resetSim();
+
+/* ============================================================
+   Exploded assembly panel — its own scene, always separated
+   ============================================================ */
+(function(){
+var eCv=document.getElementById('expCv'), eStage=document.getElementById('expStage');
+if(!eCv) return;
+var eR=new THREE.WebGLRenderer({canvas:eCv,antialias:true,alpha:false});
+eR.setPixelRatio(Math.min(devicePixelRatio,2));
+eR.outputEncoding=THREE.sRGBEncoding;
+var eS=new THREE.Scene(), eC=new THREE.PerspectiveCamera(30,16/9,1,6000);
+eS.add(new THREE.HemisphereLight(0xffffff,0x404850,.82));
+var eK=new THREE.DirectionalLight(0xffffff,.78); eK.position.set(340,520,380); eS.add(eK);
+var eF=new THREE.DirectionalLight(0xffffff,.34); eF.position.set(-320,180,-280); eS.add(eF);
+
+var eGroup=new THREE.Group(); eS.add(eGroup);
+var eItems=[], eLabelBox=document.getElementById('expLabels'), eLabels=[];
+
+/* explode offsets, mm — vertical for the brazed sandwich,
+   lateral for the parts that attach from the side, back or front */
+var OFF={ pad:[0,232,0], topSkin:[0,168,0], core:[0,104,0], botSkin:[0,44,0],
+          feet:[0,-46,0], rails:[250,44,0], dock:[0,44,-250], magnets:[0,44,-372],
+          trim:[0,44,236] };
+var NAME={pad:'Thermal pad',topSkin:'Top skin',core:'Corrugated core',botSkin:'Bottom skin',
+          feet:'Non-slip feet',rails:'Side rails ×2',dock:'Rear dock plate',
+          magnets:'Magnets ×2',trim:'Edge trim'};
+
+function eDispose(){
+  for(var i=eGroup.children.length-1;i>=0;i--){
+    var c=eGroup.children[i];
+    if(c.geometry) c.geometry.dispose();
+    if(c.material&&c.material.dispose) c.material.dispose();
+    eGroup.remove(c);
+  }
+  eItems.length=0;
+}
+function add(mesh,id){
+  var o=OFF[id]||[0,0,0];
+  mesh.position.x+=o[0]; mesh.position.y+=o[1]; mesh.position.z+=o[2];
+  mesh.material=mesh.material.clone();
+  eGroup.add(mesh);
+  if(!eItems.some(function(t){return t.id===id;}))
+    eItems.push({id:id, v:new THREE.Vector3(mesh.position.x,mesh.position.y,mesh.position.z)});
+  return mesh;
+}
+function buildExploded(){
+  eDispose();
+  var rearH=P.rearH*1000, tan=rearH/LD, ang=Math.atan(tan);
+  var z0=FZ-LD*P.coverage, z1=RZ, depth=z0-z1, midZ=(z0+z1)/2;
+  var frontH=(FZ-z0)*tan, skin=1.0, pitch=P.pitch*1000, slant=depth/Math.cos(ang);
+
+  var top=new THREE.Mesh(new THREE.BoxGeometry(WS,skin,slant),matSkin);
+  top.rotation.x=ang; top.position.set(0,(FZ-midZ)*tan-skin/2*Math.cos(ang),midZ);
+  add(top,'topSkin');
+
+  var padSl=(depth*0.62)/Math.cos(ang), padZ=midZ-depth*0.10;
+  var pad=new THREE.Mesh(new THREE.BoxGeometry(WS*0.80,1.2,padSl),matPad);
+  pad.rotation.x=ang; pad.position.set(0,(FZ-padZ)*tan+0.6*Math.cos(ang),padZ);
+  add(pad,'pad');
+
+  var bot=new THREE.Mesh(new THREE.BoxGeometry(WS,skin,depth),matSkin);
+  bot.position.set(0,skin/2,midZ); add(bot,'botSkin');
+
+  var nz=10, half=pitch/2, nk=Math.max(4,Math.round(WS/half)), pos=[], idx=[];
+  for(var k=0;k<=nk;k++){ var x=-WS/2+k*half;
+    for(var j=0;j<=nz;j++){ var z=z1+(j/nz)*(z0-z1);
+      pos.push(x,(k%2===0)?skin:(FZ-z)*tan-skin,z); } }
+  for(var k2=0;k2<nk;k2++) for(var j2=0;j2<nz;j2++){
+    var a=k2*(nz+1)+j2,b=(k2+1)*(nz+1)+j2,c=(k2+1)*(nz+1)+j2+1,d=k2*(nz+1)+j2+1;
+    idx.push(a,b,c,a,c,d); }
+  var cg=new THREE.BufferGeometry();
+  cg.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));
+  cg.setIndex(idx); cg.computeVertexNormals();
+  add(new THREE.Mesh(cg,matCore),'core');
+
+  [-1,1].forEach(function(sd){
+    var sh=new THREE.Shape();
+    sh.moveTo(z1,0); sh.lineTo(z0,0); sh.lineTo(z0,frontH); sh.lineTo(z1,rearH);
+    var m=new THREE.Mesh(new THREE.ExtrudeGeometry(sh,{depth:2.4,bevelEnabled:false}),matStand);
+    m.rotation.y=-Math.PI/2; m.position.set(sd>0?WS/2:-WS/2+2.4,0,0);
+    m.position.x+=sd*250; m.position.y+=44;
+    m.material=m.material.clone(); eGroup.add(m);
+  });
+  eItems.push({id:'rails', v:new THREE.Vector3(WS/2+250,44+rearH*0.4,midZ)});
+
+  var dock=new THREE.Mesh(new THREE.BoxGeometry(WS,rearH,2.2),matStand);
+  dock.position.set(0,rearH/2,z1-1.1); add(dock,'dock');
+
+  [-1,1].forEach(function(sd){
+    var mg=new THREE.Mesh(new THREE.CylinderGeometry(7,7,2.6,18),matMag);
+    mg.rotation.x=Math.PI/2; mg.position.set(sd*100,rearH/2,z1-2.4);
+    mg.position.y+=44; mg.position.z-=372;
+    mg.material=mg.material.clone(); eGroup.add(mg);
+  });
+  eItems.push({id:'magnets', v:new THREE.Vector3(100,44+rearH/2,z1-2.4-372)});
+
+  [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(function(q){
+    var f=new THREE.Mesh(new THREE.CylinderGeometry(7,7,1.6,16),matFoot);
+    f.position.set(q[0]*(WS/2-16),-0.8,midZ+q[1]*(depth/2-14));
+    f.position.y+=-46; f.material=f.material.clone(); eGroup.add(f);
+  });
+  eItems.push({id:'feet', v:new THREE.Vector3(WS/2-16,-46,midZ)});
+
+  var trim=new THREE.Mesh(new THREE.BoxGeometry(WS,Math.max(frontH*0.9,3),2.6),matTrim);
+  trim.position.set(0,frontH*0.5,z0+1.3); add(trim,'trim');
+
+  /* dashed guide showing the assembly axis of the brazed stack */
+  var gp=[];
+  for(var y=-60;y<=250;y+=14) gp.push(new THREE.Vector3(0,y,midZ),new THREE.Vector3(0,y+7,midZ));
+  var gl=new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(gp),
+        new THREE.LineBasicMaterial({color:0x8a9499,transparent:true,opacity:.5}));
+  eGroup.add(gl);
+
+  /* labels */
+  eLabelBox.innerHTML=''; eLabels=[];
+  eItems.forEach(function(it){
+    var d=document.createElement('div'); d.className='elab'; d.textContent=NAME[it.id]||it.id;
+    d.dataset.part=it.id; eLabelBox.appendChild(d); eLabels.push(d);
+  });
+}
+
+/* orbit */
+var eSph={r:1320,th:.68,ph:1.13}, eGoal={r:1320,th:.68,ph:1.13}, eDrag=null, spinOn=true;
+eCv.addEventListener('pointerdown',function(e){ eCv.setPointerCapture(e.pointerId);
+  eDrag={x:e.clientX,y:e.clientY}; spinOn=false; });
+eCv.addEventListener('pointermove',function(e){
+  if(!eDrag) return; var dx=e.clientX-eDrag.x, dy=e.clientY-eDrag.y;
+  eDrag.x=e.clientX; eDrag.y=e.clientY;
+  eGoal.th-=dx*.006; eGoal.ph=Math.max(.2,Math.min(1.5,eGoal.ph-dy*.005));
+});
+['pointerup','pointercancel','pointerleave'].forEach(function(ev){
+  eCv.addEventListener(ev,function(){eDrag=null;}); });
+eCv.addEventListener('wheel',function(e){ e.preventDefault();
+  eGoal.r=Math.max(600,Math.min(2600,eGoal.r*(1+Math.sign(e.deltaY)*.1))); },{passive:false});
+
+var eVis=true;
+if(window.IntersectionObserver) new IntersectionObserver(function(en){ eVis=en[0].isIntersecting; },
+  {rootMargin:'120px'}).observe(eStage);
+function eResize(){ var w=eStage.clientWidth,h=eStage.clientHeight;
+  eR.setSize(w,h,false); eC.aspect=w/h; eC.updateProjectionMatrix(); }
+new ResizeObserver(eResize).observe(eStage);
+
+var eTarget=new THREE.Vector3(0,80,-10), ev=new THREE.Vector3();
+function eFrame(){
+  requestAnimationFrame(eFrame);
+  if(!eVis) return;
+  eS.background=new THREE.Color(tok('--stage')||'#E6EAEC');
+  if(spinOn) eGoal.th+=0.0016;
+  eSph.r+=(eGoal.r-eSph.r)*.1; eSph.th+=(eGoal.th-eSph.th)*.1; eSph.ph+=(eGoal.ph-eSph.ph)*.1;
+  eC.position.set(eTarget.x+eSph.r*Math.sin(eSph.ph)*Math.sin(eSph.th),
+                  eTarget.y+eSph.r*Math.cos(eSph.ph),
+                  eTarget.z+eSph.r*Math.sin(eSph.ph)*Math.cos(eSph.th));
+  eC.lookAt(eTarget);
+  eR.render(eS,eC);
+  var w=eStage.clientWidth,h=eStage.clientHeight;
+  eItems.forEach(function(it,i){
+    var d=eLabels[i]; if(!d) return;
+    ev.copy(it.v).project(eC);
+    if(ev.z>1){ d.style.opacity=0; return; }
+    d.style.opacity=1;
+    d.style.left=((ev.x*.5+.5)*w)+'px'; d.style.top=((-ev.y*.5+.5)*h)+'px';
+  });
+}
+window.__rebuildExploded=function(){ buildExploded(); };
+buildExploded(); eResize(); eFrame();
+})();
 
 var DT=0.1, acc=0, lastRead=0, last=performance.now();
 function frame(now){
